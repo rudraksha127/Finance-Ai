@@ -124,7 +124,9 @@ def feature_drift(
     return sorted(results, key=lambda r: r.psi, reverse=True)
 
 
-def missingness_drift(reference: pd.DataFrame, current: pd.DataFrame, features: list[str]) -> FeatureDrift | None:
+def missingness_drift(
+    reference: pd.DataFrame, current: pd.DataFrame, features: list[str]
+) -> FeatureDrift | None:
     """Single aggregated missingness signal (milestone §13)."""
     if not features:
         return None
@@ -147,9 +149,7 @@ def missingness_drift(reference: pd.DataFrame, current: pd.DataFrame, features: 
     )
 
 
-def prediction_drift(
-    ref_probs: np.ndarray, cur_probs: np.ndarray, n_classes: int = 3
-) -> str:
+def prediction_drift(ref_probs: np.ndarray, cur_probs: np.ndarray, n_classes: int = 3) -> str:
     """Prediction-distribution drift severity from class-probability vectors.
 
     Uses PSI on the predicted-class proportions (UP/DOWN/HOLD).
@@ -164,9 +164,7 @@ def prediction_drift(
     return _severity_from_psi(psi, len(cur_classes))
 
 
-def performance_status(
-    baseline_accuracy: float, current_accuracy: float, n_current: int
-) -> str:
+def performance_status(baseline_accuracy: float, current_accuracy: float, n_current: int) -> str:
     """Performance degradation status (milestone §18/§19).
 
     Rules: WARNING when accuracy drops >= 5pp below baseline with >= 30
@@ -195,9 +193,7 @@ def fdr_correct(pvalues: list[float | None]) -> list[float | None]:
     out = list(pvalues)
     vals = sorted((pvalues[i], i) for i in valid_idx)
     n = len(vals)
-    rank = 0
-    for p, i in vals:
-        rank += 1
+    for rank, (p, i) in enumerate(vals, start=1):
         q = p * n / rank
         out[i] = round(min(q, 1.0), 6)
     # enforce monotonicity (largest q = min of suffix)

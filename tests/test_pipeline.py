@@ -10,7 +10,7 @@ and historical dataset immutability (section 39).
 
 from __future__ import annotations
 
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 from pathlib import Path
 
 import pandas as pd
@@ -69,9 +69,13 @@ def test_watermark_atomic_write_is_idempotent(tmp_path: Path):
     for _ in range(2):
         store.set(
             Watermark(
-                instrument="AAPL", interval="1d", source="yahoo_finance",
-                last_successful_timestamp="2026-09-04", pipeline_run_id="run1",
-                status="COMPLETED", updated_at="2026-09-08T00:00:00",
+                instrument="AAPL",
+                interval="1d",
+                source="yahoo_finance",
+                last_successful_timestamp="2026-09-04",
+                pipeline_run_id="run1",
+                status="COMPLETED",
+                updated_at="2026-09-08T00:00:00",
             )
         )
     assert not (tmp_path / "watermarks.json.tmp").exists()
@@ -82,9 +86,7 @@ def test_watermark_atomic_write_is_idempotent(tmp_path: Path):
 # ---------------------------------------------------------------------------
 def test_gap_detection_ignores_weekends():
     # Fri 2026-09-04, Mon 2026-09-07, Tue 2026-09-08: no missing business days
-    dates = pd.DatetimeIndex(
-        pd.to_datetime(["2026-09-04", "2026-09-07", "2026-09-08"])
-    )
+    dates = pd.DatetimeIndex(pd.to_datetime(["2026-09-04", "2026-09-07", "2026-09-08"]))
     assert detect_missing_range(dates) == []
 
 
@@ -186,17 +188,13 @@ def _synthetic_rows(start: date, days: int, base: float = 100.0) -> list[dict]:
     return rows
 
 
-@pytest.mark.skipif(
-    not hasattr(PipelineEngine, "run"), reason="engine API missing"
-)
+@pytest.mark.skipif(not hasattr(PipelineEngine, "run"), reason="engine API missing")
 def test_pipeline_end_to_end_and_idempotent(pipeline_config, tmp_path):
     # ~135 business days ending near 'now' so freshness scores well and the
     # 118-row feature warm-up + 5-day label horizon are satisfied.
     rows = _synthetic_rows(date(2026, 2, 20), 135)
     source = _ScriptedSource(rows)
-    engine = PipelineEngine(
-        pipeline_config, pipeline_dir=tmp_path / "pipeline", source=source
-    )
+    engine = PipelineEngine(pipeline_config, pipeline_dir=tmp_path / "pipeline", source=source)
     result = engine.run("AAPL", start="2026-02-20", end="2026-09-08")
     assert result.status in ("COMPLETED", "FAILED"), result.error
     if result.status != "COMPLETED":
@@ -233,7 +231,6 @@ def test_failed_run_does_not_advance_watermark(pipeline_config, tmp_path):
 
 def test_stage_failure_stops_downstream(pipeline_config, tmp_path):
     """Ingestion succeeds; cleaning fails -> features/labels/dataset not run."""
-    from src.cleaning.pipeline import CleaningPipeline
 
     rows = _synthetic_rows(date(2026, 7, 1), 10)
 
@@ -252,9 +249,7 @@ def test_stage_failure_stops_downstream(pipeline_config, tmp_path):
                 records=tuple(rows),
             )
 
-    engine = PipelineEngine(
-        pipeline_config, pipeline_dir=tmp_path / "pipeline", source=_Source()
-    )
+    engine = PipelineEngine(pipeline_config, pipeline_dir=tmp_path / "pipeline", source=_Source())
     result = engine.run("AAPL", start="2026-07-01", end="2026-07-15")
     names = [s.name for s in result.stages]
     assert "INGESTION" in names
@@ -277,9 +272,7 @@ def test_incremental_equals_full_recomputation(pipeline_config, tmp_path):
     """
     rows = _synthetic_rows(date(2026, 2, 20), 135)
     source = _ScriptedSource(rows)
-    engine = PipelineEngine(
-        pipeline_config, pipeline_dir=tmp_path / "pipeline", source=source
-    )
+    engine = PipelineEngine(pipeline_config, pipeline_dir=tmp_path / "pipeline", source=source)
     result = engine.run("AAPL", start="2026-02-20", end="2026-09-08")
     if result.status != "COMPLETED":
         pytest.skip(f"fixture insufficient: {result.error}")

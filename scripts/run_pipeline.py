@@ -35,10 +35,13 @@ def main(argv: Sequence[str] | None = None) -> int:
     )
     parser.add_argument("--instrument", required=True, help="Canonical ticker, e.g. AAPL")
     parser.add_argument("--interval", default=None, help="1d | 1wk | 1mo (default: config)")
-    parser.add_argument("--from", dest="start", default=None, help="Inclusive start date (YYYY-MM-DD)")
+    parser.add_argument(
+        "--from", dest="start", default=None, help="Inclusive start date (YYYY-MM-DD)"
+    )
     parser.add_argument("--to", dest="end", default=None, help="Inclusive end date (YYYY-MM-DD)")
     parser.add_argument(
-        "--dry-run", action="store_true",
+        "--dry-run",
+        action="store_true",
         help="Show the plan (watermark, range, stages) without writing anything",
     )
     parser.add_argument("--env", choices=ENVIRONMENTS, default=None)
@@ -92,9 +95,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 "error": result.error,
                 "warnings": result.warnings,
                 "end_watermark": (
-                    result.end_watermark.last_successful_timestamp
-                    if result.end_watermark
-                    else None
+                    result.end_watermark.last_successful_timestamp if result.end_watermark else None
                 ),
             },
             indent=2,

@@ -7,11 +7,6 @@ audit, and system status.
 
 from __future__ import annotations
 
-import json
-from datetime import datetime, timedelta, timezone
-
-import pandas as pd
-
 
 def test_list_datasets(api_client, api_state):
     response = api_client.get("/datasets")
@@ -19,7 +14,13 @@ def test_list_datasets(api_client, api_state):
     datasets = response.json()
     assert len(datasets) >= 1
     top = datasets[0]
-    for field in ("dataset_version", "row_count", "feature_count", "quality_score", "label_version"):
+    for field in (
+        "dataset_version",
+        "row_count",
+        "feature_count",
+        "quality_score",
+        "label_version",
+    ):
         assert field in top
     assert top["dataset_version"] == "v0.1"
 
@@ -72,8 +73,8 @@ def test_get_experiment_unknown(api_client):
 
 def test_backtest_end_to_end_roundtrip(api_client, api_state):
     """Run a real static backtest, then read it back through the API."""
-    from src.backtest.engine import BacktestEngine
     from src.backtest.data import load_backtest_data
+    from src.backtest.engine import BacktestEngine
     from src.backtest.prediction import load_model_predictions
     from tests.backtest_helpers import TICKER
 
@@ -89,7 +90,9 @@ def test_backtest_end_to_end_roundtrip(api_client, api_state):
     predictions = load_model_predictions(
         data, model_version="api_test_model_v1", model_dir=api_state.config.model.artifact_dir
     )
-    result = engine.run_static(data, predictions.frame, model_version="api_test_model_v1", backtest_id="bt_readtest")
+    engine.run_static(
+        data, predictions.frame, model_version="api_test_model_v1", backtest_id="bt_readtest"
+    )
 
     listing = api_client.get("/backtests").json()
     assert any(b["backtest_id"] == "bt_readtest" for b in listing)

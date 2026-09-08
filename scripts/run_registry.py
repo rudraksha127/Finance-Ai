@@ -29,7 +29,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--show", metavar="MODEL_VERSION", help="Show one model record")
     parser.add_argument("--promote", metavar="CANDIDATE", help="Promote an APPROVED candidate")
     parser.add_argument("--rollback", metavar="TARGET", help="Roll back to a previous model")
-    parser.add_argument("--dry-run", action="store_true", help="Show the plan without changing state")
+    parser.add_argument(
+        "--dry-run", action="store_true", help="Show the plan without changing state"
+    )
     parser.add_argument("--reason", default="", help="Audit reason")
     parser.add_argument("--env", choices=ENVIRONMENTS, default=None)
     args = parser.parse_args(list(argv) if argv is not None else None)
@@ -40,7 +42,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(f"configuration error: {error.message}", file=sys.stderr)
         return 2
     configure_from_config(config)
-    logger = get_logger("registry.cli")
+    get_logger("registry.cli")
     registry = ModelRegistry(config)
 
     try:

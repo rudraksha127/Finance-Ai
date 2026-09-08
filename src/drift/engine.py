@@ -22,15 +22,15 @@ import numpy as np
 import pandas as pd
 
 from src.config.loader import AppConfig
-from src.logging.logger import get_logger
 from src.drift.metrics import (
     FeatureDrift,
-    feature_drift,
     fdr_correct,
+    feature_drift,
     missingness_drift,
     performance_status,
     prediction_drift,
 )
+from src.logging.logger import get_logger
 
 logger = get_logger("drift.engine")
 
@@ -159,7 +159,9 @@ class DriftEngine:
                 self.config.data.processed_dir, fversion, instrument
             )
             if not path.exists():
-                return self._failed_report(run_id, f"no feature artifact for {instrument} ({fversion})")
+                return self._failed_report(
+                    run_id, f"no feature artifact for {instrument} ({fversion})"
+                )
             frame = feature_storage.read_features(path)
             if len(frame) < self.min_window + 10:
                 insufficient = True
@@ -172,21 +174,29 @@ class DriftEngine:
             # Injected frames (tests/CLI): use the numeric columns common to
             # both windows so custom feature sets are supported.
             common = [c for c in reference_frame.columns if c in current_frame.columns]
-            features = [
-                c for c in common if pd.api.types.is_numeric_dtype(reference_frame[c])
-            ]
+            features = [c for c in common if pd.api.types.is_numeric_dtype(reference_frame[c])]
         drifts = feature_drift(reference_frame, current_frame, features)
 
         # FDR correction across KS p-values (milestone §12).
         pvals = [d.ks_pvalue for d in drifts]
         corrected = fdr_correct(pvals)
         drifts = [
-            d if p is None or c is None or c >= 0.05 or d.severity == "INSUFFICIENT_DATA"
-            else FeatureDrift(
-                feature=d.feature, psi=d.psi, ks_statistic=d.ks_statistic, ks_pvalue=c,
-                ref_mean=d.ref_mean, cur_mean=d.cur_mean, ref_std=d.ref_std, cur_std=d.cur_std,
-                ref_missing=d.ref_missing, cur_missing=d.cur_missing,
-                severity="YELLOW" if d.severity == "GREEN" else d.severity,
+            (
+                d
+                if p is None or c is None or c >= 0.05 or d.severity == "INSUFFICIENT_DATA"
+                else FeatureDrift(
+                    feature=d.feature,
+                    psi=d.psi,
+                    ks_statistic=d.ks_statistic,
+                    ks_pvalue=c,
+                    ref_mean=d.ref_mean,
+                    cur_mean=d.cur_mean,
+                    ref_std=d.ref_std,
+                    cur_std=d.cur_std,
+                    ref_missing=d.ref_missing,
+                    cur_missing=d.cur_missing,
+                    severity="YELLOW" if d.severity == "GREEN" else d.severity,
+                )
             )
             for d, p, c in zip(drifts, pvals, corrected)
         ]
@@ -252,7 +262,9 @@ class DriftEngine:
         # --- Performance monitoring -------------------------------------
         perf_status: str | None = None
         if baseline_accuracy is not None and current_accuracy is not None:
-            perf_status = performance_status(baseline_accuracy, current_accuracy, len(current_frame))
+            perf_status = performance_status(
+                baseline_accuracy, current_accuracy, len(current_frame)
+            )
             if perf_status in ("WARNING", "CRITICAL"):
                 events.append(
                     self._event(
@@ -333,7 +345,9 @@ class DriftEngine:
         """Merge repeated fingerprints into occurrence counts (milestone §29)."""
         existing: dict[str, DriftEvent] = {}
         if (self.monitoring_dir / "events.jsonl").exists():
-            for line in (self.monitoring_dir / "events.jsonl").read_text(encoding="utf-8").splitlines():
+            for line in (
+                (self.monitoring_dir / "events.jsonl").read_text(encoding="utf-8").splitlines()
+            ):
                 if not line.strip():
                     continue
                 raw = json.loads(line)
@@ -344,8 +358,11 @@ class DriftEngine:
             prior = existing.get(event.fingerprint)
             if prior is not None:
                 updated = DriftEvent(
-                    **{**asdict(prior), "last_seen": event.event_timestamp,
-                       "occurrence_count": prior.occurrence_count + 1}
+                    **{
+                        **asdict(prior),
+                        "last_seen": event.event_timestamp,
+                        "occurrence_count": prior.occurrence_count + 1,
+                    }
                 )
                 merged.append(updated)
                 existing.pop(event.fingerprint)
@@ -399,8 +416,12 @@ class DriftEngine:
             "status": report.status,
             "model_version": model_version,
             "dataset_version": dataset_version,
-            "open_critical": sum(1 for e in report.events if e.severity == "CRITICAL" and e.status == "OPEN"),
-            "open_warning": sum(1 for e in report.events if e.severity == "WARNING" and e.status == "OPEN"),
+            "open_critical": sum(
+                1 for e in report.events if e.severity == "CRITICAL" and e.status == "OPEN"
+            ),
+            "open_warning": sum(
+                1 for e in report.events if e.severity == "WARNING" and e.status == "OPEN"
+            ),
             "top_drifted_features": [
                 {"feature": d.feature, "psi": d.psi, "severity": d.severity}
                 for d in report.feature_drifts[:5]

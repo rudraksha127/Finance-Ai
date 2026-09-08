@@ -28,6 +28,11 @@ line_length = 100
 line-length = 100
 target-version = "py310"
 
+[tool.ruff.lint]
+# B008: `Depends(...)` in argument defaults is the documented FastAPI idiom
+# (src/api/reads.py); ruff flags it as a false positive there.
+ignore = ["B008"]
+
 [tool.ruff.lint.per-file-ignores]
 # Naive datetimes are intentional in tests: the approved storage policy
 # stores naive-UTC timestamps (DATA_ARCHITECTURE.md section 4.2), and the

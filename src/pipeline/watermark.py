@@ -34,7 +34,7 @@ class Watermark:
     updated_at: str  # ISO datetime (naive UTC)
 
     @classmethod
-    def from_dict(cls, raw: dict) -> "Watermark":
+    def from_dict(cls, raw: dict) -> Watermark:
         return cls(
             instrument=raw["instrument"],
             interval=raw["interval"],

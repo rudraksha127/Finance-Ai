@@ -9,8 +9,6 @@ awareness (real shifts are detected).
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import numpy as np
 import pandas as pd
 import pytest
@@ -18,9 +16,7 @@ import pytest
 from src.config.loader import load_config
 from src.drift.engine import DriftEngine
 from src.drift.metrics import (
-    PSI_GREEN_MAX,
     PSI_YELLOW_MAX,
-    feature_drift,
     fdr_correct,
     missingness_drift,
     performance_status,
@@ -220,7 +216,7 @@ def test_fdr_correction_bounds_false_positives():
     # 52 features, 50 truly-null p-values near 0.5, 2 tiny
     pvalues = [0.5] * 50 + [0.001, 0.002] + [None, None]
     corrected = fdr_correct(pvalues)
-    assert all(p is None for p in corrected[-2:])
+    assert all(p is None for p in corrected[len(pvalues) - 2 :])
     # null features stay above 0.05 after correction
     assert all(p >= 0.05 for p in corrected[:50])
 

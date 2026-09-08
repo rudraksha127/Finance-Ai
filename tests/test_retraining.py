@@ -14,9 +14,10 @@ from pathlib import Path
 
 import pytest
 
-from src.config.loader import ModelConfig, RetrainingConfig, load_config
+from src.config.loader import ModelConfig, RetrainingConfig
 from src.retraining.engine import RetrainingEngine
 from tests.api_helpers import make_api_config  # sandboxed config + trained model
+
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -41,9 +42,7 @@ def retrain_config(tmp_path: Path):
 # Eligibility (section 8)
 # ---------------------------------------------------------------------------
 def test_missing_dataset_is_skipped(retrain_config, tmp_path):
-    engine = RetrainingEngine(
-        retrain_config, retraining_dir=tmp_path / "retraining"
-    )
+    engine = RetrainingEngine(retrain_config, retraining_dir=tmp_path / "retraining")
     run = engine.evaluate_trigger(
         trigger_type="manual", trigger_reason="test", dataset_version="v9.9"
     )
@@ -54,14 +53,15 @@ def test_missing_dataset_is_skipped(retrain_config, tmp_path):
 def test_cooldown_blocks_retraining(retrain_config, tmp_path, monkeypatch):
     """Cooldown blocks retraining when the fingerprint DIFFERS (new inputs)
     but the cooldown window has not elapsed."""
-    strict = replace(retrain_config, retraining=replace(retrain_config.retraining, cooldown_days=30))
+    strict = replace(
+        retrain_config, retraining=replace(retrain_config.retraining, cooldown_days=30)
+    )
     engine = RetrainingEngine(strict, retraining_dir=tmp_path / "retraining")
     first = engine.evaluate_trigger(trigger_type="manual", trigger_reason="first")
     assert first.status in ("APPROVED", "REJECTED")
 
     # Simulate changed inputs: a different fingerprint on the next trigger.
     calls = {"n": 0}
-    original = engine._fingerprint
 
     def _varying(*args, **kwargs):
         calls["n"] += 1
@@ -74,9 +74,7 @@ def test_cooldown_blocks_retraining(retrain_config, tmp_path, monkeypatch):
 
 
 def test_identical_fingerprint_is_skipped(retrain_config, tmp_path):
-    engine = RetrainingEngine(
-        retrain_config, retraining_dir=tmp_path / "retraining"
-    )
+    engine = RetrainingEngine(retrain_config, retraining_dir=tmp_path / "retraining")
     first = engine.evaluate_trigger(trigger_type="manual", trigger_reason="first")
     assert first.status in ("APPROVED", "REJECTED")
     second = engine.evaluate_trigger(trigger_type="manual", trigger_reason="second")
@@ -88,12 +86,8 @@ def test_identical_fingerprint_is_skipped(retrain_config, tmp_path):
 # Dry run (section 39)
 # ---------------------------------------------------------------------------
 def test_dry_run_does_not_train(retrain_config, tmp_path):
-    engine = RetrainingEngine(
-        retrain_config, retraining_dir=tmp_path / "retraining"
-    )
-    run = engine.evaluate_trigger(
-        trigger_type="manual", trigger_reason="dry", dry_run=True
-    )
+    engine = RetrainingEngine(retrain_config, retraining_dir=tmp_path / "retraining")
+    run = engine.evaluate_trigger(trigger_type="manual", trigger_reason="dry", dry_run=True)
     assert run.status == "TRIGGERED"
     assert run.candidate_model_version is None
     # No new model artifacts beyond the fixture model
@@ -105,9 +99,7 @@ def test_dry_run_does_not_train(retrain_config, tmp_path):
 # Candidate flow + gates (sections 15/18/19)
 # ---------------------------------------------------------------------------
 def test_candidate_trains_and_gates_evaluate(retrain_config, tmp_path):
-    engine = RetrainingEngine(
-        retrain_config, retraining_dir=tmp_path / "retraining"
-    )
+    engine = RetrainingEngine(retrain_config, retraining_dir=tmp_path / "retraining")
     run = engine.evaluate_trigger(trigger_type="manual", trigger_reason="gate-test")
     assert run.status in ("APPROVED", "REJECTED")
     assert run.decision in ("CANDIDATE_APPROVED", "CANDIDATE_REJECTED")
@@ -115,8 +107,12 @@ def test_candidate_trains_and_gates_evaluate(retrain_config, tmp_path):
     assert len(run.gate_results) == 7
     gate_names = [g["gate"] for g in run.gate_results]
     assert gate_names == [
-        "G1_DATA_QUALITY", "G2_TRAINING_VALIDITY", "G3_PREDICTION_SANITY",
-        "G4_PREDICTIVE_QUALITY", "G5_FINANCIAL_PERFORMANCE", "G6_ROBUSTNESS",
+        "G1_DATA_QUALITY",
+        "G2_TRAINING_VALIDITY",
+        "G3_PREDICTION_SANITY",
+        "G4_PREDICTIVE_QUALITY",
+        "G5_FINANCIAL_PERFORMANCE",
+        "G6_ROBUSTNESS",
         "G7_OPERATIONAL_HEALTH",
     ]
     # Run record persisted with full audit trail
@@ -128,9 +124,7 @@ def test_candidate_trains_and_gates_evaluate(retrain_config, tmp_path):
 
 
 def test_candidate_version_uses_new_artifact(retrain_config, tmp_path):
-    engine = RetrainingEngine(
-        retrain_config, retraining_dir=tmp_path / "retraining"
-    )
+    engine = RetrainingEngine(retrain_config, retraining_dir=tmp_path / "retraining")
     run = engine.evaluate_trigger(trigger_type="manual", trigger_reason="artifact-test")
     assert run.status in ("APPROVED", "REJECTED")
     candidate_dir = retrain_config.model.artifact_dir / run.candidate_model_version
@@ -142,9 +136,7 @@ def test_candidate_version_uses_new_artifact(retrain_config, tmp_path):
 # CRITICAL SAFETY TEST (section 41 — mandatory)
 # ---------------------------------------------------------------------------
 def test_training_failure_cannot_change_current_model(retrain_config, tmp_path, monkeypatch):
-    engine = RetrainingEngine(
-        retrain_config, retraining_dir=tmp_path / "retraining"
-    )
+    engine = RetrainingEngine(retrain_config, retraining_dir=tmp_path / "retraining")
     before = engine._latest_model_version()
     assert before is not None
 
@@ -165,12 +157,11 @@ def test_training_failure_cannot_change_current_model(retrain_config, tmp_path, 
 
 def test_rejection_cannot_change_current_model(retrain_config, tmp_path):
     """Even when a candidate is REJECTED, the current model is untouched."""
-    engine = RetrainingEngine(
-        retrain_config, retraining_dir=tmp_path / "retraining"
-    )
+    engine = RetrainingEngine(retrain_config, retraining_dir=tmp_path / "retraining")
     before = engine._latest_model_version()
     run = engine.evaluate_trigger(
-        trigger_type="manual", trigger_reason="rejection-test",
+        trigger_type="manual",
+        trigger_reason="rejection-test",
     )
     # Whether approved or rejected, the previous model artifact still exists
     # and loads; no artifact was deleted or overwritten.
@@ -185,9 +176,7 @@ def test_rejection_cannot_change_current_model(retrain_config, tmp_path):
 # Run record / state machine (section 36)
 # ---------------------------------------------------------------------------
 def test_run_states_are_explicit(retrain_config, tmp_path):
-    engine = RetrainingEngine(
-        retrain_config, retraining_dir=tmp_path / "retraining"
-    )
+    engine = RetrainingEngine(retrain_config, retraining_dir=tmp_path / "retraining")
     run = engine.evaluate_trigger(trigger_type="manual", trigger_reason="states")
     assert run.status in ("APPROVED", "REJECTED", "SKIPPED", "FAILED")
     if run.status == "SKIPPED":

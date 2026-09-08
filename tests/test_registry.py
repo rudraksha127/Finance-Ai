@@ -10,12 +10,10 @@ from __future__ import annotations
 
 import json
 import threading
-from dataclasses import replace
 from pathlib import Path
 
 import pytest
 
-from src.config.loader import load_config
 from src.registry.engine import (
     ModelRegistry,
     RegistryError,
@@ -218,10 +216,14 @@ def test_audit_records_written(registry: ModelRegistry):
     registry.promote_model(version)
     audit_path = registry.audit_path
     assert audit_path.exists()
-    lines = [json.loads(line) for line in audit_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    lines = [
+        json.loads(line)
+        for line in audit_path.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
     actions = {entry["action"] for entry in lines}
     assert {"REGISTER", "VALIDATING", "APPROVED", "PROMOTE"} <= actions
-    promote = [e for e in lines if e["action"] == "PROMOTE"][0]
+    promote = next(e for e in lines if e["action"] == "PROMOTE")
     assert promote["new_active"] == version
     assert promote["success"] is True
 

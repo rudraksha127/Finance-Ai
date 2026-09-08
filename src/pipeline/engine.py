@@ -14,7 +14,6 @@ the full chain plus the quality gate succeed.
 from __future__ import annotations
 
 import json
-import time
 import uuid
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
@@ -157,10 +156,15 @@ class PipelineEngine:
         if not lock.acquire():
             logger.warning("pipeline_locked", instrument=ticker, interval=interval)
             return self._result(
-                run_id=uuid.uuid4().hex, status="SKIPPED", instrument=ticker,
-                interval=interval, requested_range=(start, end),
+                run_id=uuid.uuid4().hex,
+                status="SKIPPED",
+                instrument=ticker,
+                interval=interval,
+                requested_range=(start, end),
                 start_watermark=self.watermarks.get(ticker, interval),
-                stages=(), records_ingested=0, error="pipeline already running (lock held)",
+                stages=(),
+                records_ingested=0,
+                error="pipeline already running (lock held)",
             )
         try:
             return self._run_locked(ticker, interval, start, end, dry_run)
@@ -179,7 +183,10 @@ class PipelineEngine:
         # Resolve the range: explicit start/end, else watermark -> today
         # (incremental), else a configurable lookback from today.
         if start is None:
-            start = last_ts or (self.now - timedelta(days=config.pipeline.lookback_days)).date().isoformat()
+            start = (
+                last_ts
+                or (self.now - timedelta(days=config.pipeline.lookback_days)).date().isoformat()
+            )
         end = end or self.now.date().isoformat()
 
         # --- STAGE: INGESTION ------------------------------------------
@@ -187,37 +194,120 @@ class PipelineEngine:
         try:
             source = self.source or _build_source(config)
             engine = IngestionEngine(source, config)
-            params = FetchParams(instrument=ticker, start=date.fromisoformat(start), end=date.fromisoformat(end), interval=interval)
+            params = FetchParams(
+                instrument=ticker,
+                start=date.fromisoformat(start),
+                end=date.fromisoformat(end),
+                interval=interval,
+            )
             record = engine.run_ticker(params)
             status = record.ingestion_status
             if status in (IngestionStatus.FAILED.value, IngestionStatus.PARTIAL.value):
                 self._fail(stage, f"ingestion {status}: {record.error_message or ''}")
-                return self._finish(ticker, interval, run_id, "FAILED", start_wm, start, end, stages, 0, None, None, stage.errors[0], warnings)
+                return self._finish(
+                    ticker,
+                    interval,
+                    run_id,
+                    "FAILED",
+                    start_wm,
+                    start,
+                    end,
+                    stages,
+                    0,
+                    None,
+                    None,
+                    stage.errors[0],
+                    warnings,
+                )
             self._ok(stage, records=record.persisted_record_count, output_range=(start, end))
-        except Exception as error:
+        except Exception as error:  # noqa: BLE001
+            # stage boundary: any failure fails the run (logged, never silent)
             self._fail(stage, str(error))
-            return self._finish(ticker, interval, run_id, "FAILED", start_wm, start, end, stages, 0, None, None, stage.errors[0], warnings)
+            return self._finish(
+                ticker,
+                interval,
+                run_id,
+                "FAILED",
+                start_wm,
+                start,
+                end,
+                stages,
+                0,
+                None,
+                None,
+                stage.errors[0],
+                warnings,
+            )
 
         # --- STAGE: CLEANING -------------------------------------------
         stage = self._begin(stages, "CLEANING")
         try:
             cleaned = CleaningPipeline(config).run(ticker, interval)
-            if cleaned.quality.gate != "PASS" or cleaned.quality.overall_score < config.cleaning.quality.min_score:
-                self._fail(stage, f"cleaning quality gate failed: score={cleaned.quality.overall_score}")
-                return self._finish(ticker, interval, run_id, "FAILED", start_wm, start, end, stages, 0, None, None, stage.errors[0], warnings)
+            if (
+                cleaned.quality.gate != "PASS"
+                or cleaned.quality.overall_score < config.cleaning.quality.min_score
+            ):
+                self._fail(
+                    stage, f"cleaning quality gate failed: score={cleaned.quality.overall_score}"
+                )
+                return self._finish(
+                    ticker,
+                    interval,
+                    run_id,
+                    "FAILED",
+                    start_wm,
+                    start,
+                    end,
+                    stages,
+                    0,
+                    None,
+                    None,
+                    stage.errors[0],
+                    warnings,
+                )
             self._ok(stage, records=cleaned.cleaned_rows, output_range=(start, end))
-        except Exception as error:
+        except Exception as error:  # noqa: BLE001
+            # stage boundary: any failure fails the run (logged, never silent)
             self._fail(stage, str(error))
-            return self._finish(ticker, interval, run_id, "FAILED", start_wm, start, end, stages, 0, None, None, stage.errors[0], warnings)
+            return self._finish(
+                ticker,
+                interval,
+                run_id,
+                "FAILED",
+                start_wm,
+                start,
+                end,
+                stages,
+                0,
+                None,
+                None,
+                stage.errors[0],
+                warnings,
+            )
 
         # --- STAGE: FEATURES --------------------------------------------
         stage = self._begin(stages, "FEATURES")
         try:
             fr = FeatureEngine(config).run(ticker, interval)
             self._ok(stage, records=fr.row_count)
-        except Exception as error:
+        except Exception as error:  # noqa: BLE001
+            # stage boundary: any failure fails the run (logged, never silent)
             self._fail(stage, str(error))
-            return self._finish(ticker, interval, run_id, "FAILED", start_wm, start, end, stages, 0, None, None, stage.errors[0], warnings)
+            return self._finish(
+                ticker,
+                interval,
+                run_id,
+                "FAILED",
+                start_wm,
+                start,
+                end,
+                stages,
+                0,
+                None,
+                None,
+                stage.errors[0],
+                warnings,
+            )
 
         # --- STAGE: LABELS (future-window aware) ------------------------
         stage = self._begin(stages, "LABELS")
@@ -228,9 +318,24 @@ class PipelineEngine:
             if pending:
                 warnings.append(f"{pending} rows have PENDING_LABEL (future window incomplete)")
             self._ok(stage, records=lr.row_count)
-        except Exception as error:
+        except Exception as error:  # noqa: BLE001
+            # stage boundary: any failure fails the run (logged, never silent)
             self._fail(stage, str(error))
-            return self._finish(ticker, interval, run_id, "FAILED", start_wm, start, end, stages, 0, None, None, stage.errors[0], warnings)
+            return self._finish(
+                ticker,
+                interval,
+                run_id,
+                "FAILED",
+                start_wm,
+                start,
+                end,
+                stages,
+                0,
+                None,
+                None,
+                stage.errors[0],
+                warnings,
+            )
 
         # --- STAGE: DATASET (new immutable version when content changed) -
         stage = self._begin(stages, "DATASET")
@@ -249,17 +354,60 @@ class PipelineEngine:
             dataset_version = dr.dataset_version
             dataset_hash = dr.version_hash
             self._ok(stage, records=dr.total_rows)
-        except Exception as error:
+        except Exception as error:  # noqa: BLE001
+            # stage boundary: any failure fails the run (logged, never silent)
             self._fail(stage, str(error))
-            return self._finish(ticker, interval, run_id, "FAILED", start_wm, start, end, stages, 0, None, None, stage.errors[0], warnings)
+            return self._finish(
+                ticker,
+                interval,
+                run_id,
+                "FAILED",
+                start_wm,
+                start,
+                end,
+                stages,
+                0,
+                None,
+                None,
+                stage.errors[0],
+                warnings,
+            )
 
         # --- QUALITY GATE ------------------------------------------------
         if not self._quality_gate_ok():
             warnings.append("pipeline quality gate failed; dataset not published as valid")
             self._fail(stages[-1], "quality gate failed")
-            return self._finish(ticker, interval, run_id, "FAILED", start_wm, start, end, stages, 0, dataset_version, dataset_hash, "quality gate failed", warnings)
+            return self._finish(
+                ticker,
+                interval,
+                run_id,
+                "FAILED",
+                start_wm,
+                start,
+                end,
+                stages,
+                0,
+                dataset_version,
+                dataset_hash,
+                "quality gate failed",
+                warnings,
+            )
 
-        self._persist_run(run_id, ticker, interval, "COMPLETED", start_wm, start, end, stages, 0, dataset_version, dataset_hash, None, warnings)
+        self._persist_run(
+            run_id,
+            ticker,
+            interval,
+            "COMPLETED",
+            start_wm,
+            start,
+            end,
+            stages,
+            0,
+            dataset_version,
+            dataset_hash,
+            None,
+            warnings,
+        )
 
         # --- ADVANCE WATERMARK only after full success -------------------
         if not dry_run:
@@ -274,7 +422,21 @@ class PipelineEngine:
                     updated_at=now_naive_utc().isoformat(),
                 )
             )
-        return self._finish(ticker, interval, run_id, "COMPLETED", start_wm, start, end, stages, 0, dataset_version, dataset_hash, None, warnings)
+        return self._finish(
+            ticker,
+            interval,
+            run_id,
+            "COMPLETED",
+            start_wm,
+            start,
+            end,
+            stages,
+            0,
+            dataset_version,
+            dataset_hash,
+            None,
+            warnings,
+        )
 
     # ------------------------------------------------------------------
     def _quality_gate_ok(self) -> bool:
@@ -299,7 +461,22 @@ class PipelineEngine:
         object.__setattr__(stage, "completed_at", now_naive_utc().isoformat())
         object.__setattr__(stage, "errors", [message])
 
-    def _persist_run(self, run_id, ticker, interval, status, start_wm, start, end, stages, records, dversion, dhash, error, warnings) -> None:
+    def _persist_run(
+        self,
+        run_id,
+        ticker,
+        interval,
+        status,
+        start_wm,
+        start,
+        end,
+        stages,
+        records,
+        dversion,
+        dhash,
+        error,
+        warnings,
+    ) -> None:
         payload = {
             "run_id": run_id,
             "instrument": ticker,
@@ -317,33 +494,82 @@ class PipelineEngine:
             "created_at": now_naive_utc().isoformat(),
         }
         self.runs_dir.mkdir(parents=True, exist_ok=True)
-        (self.runs_dir / f"{run_id}.json").write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
+        (self.runs_dir / f"{run_id}.json").write_text(
+            json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8"
+        )
 
-    def _finish(self, ticker, interval, run_id, status, start_wm, start, end, stages, records, dversion, dhash, error, warnings) -> PipelineRunResult:
+    def _finish(
+        self,
+        ticker,
+        interval,
+        run_id,
+        status,
+        start_wm,
+        start,
+        end,
+        stages,
+        records,
+        dversion,
+        dhash,
+        error,
+        warnings,
+    ) -> PipelineRunResult:
         # Persist the run record for EVERY terminal status (success and
         # failure alike) so failures are auditable and recoverable.
-        self._persist_run(run_id, ticker, interval, status, start_wm, start, end, stages, records, dversion, dhash, error, warnings)
+        self._persist_run(
+            run_id,
+            ticker,
+            interval,
+            status,
+            start_wm,
+            start,
+            end,
+            stages,
+            records,
+            dversion,
+            dhash,
+            error,
+            warnings,
+        )
         return PipelineRunResult(
-            run_id=run_id, instrument=ticker, interval=interval, status=status,
+            run_id=run_id,
+            instrument=ticker,
+            interval=interval,
+            status=status,
             pipeline_config_version=self.config.pipeline.config_version,
-            start_watermark=start_wm, end_watermark=self.watermarks.get(ticker, interval),
-            requested_range=(start, end), stages=tuple(stages), records_ingested=records,
-            dataset_version=dversion, dataset_hash=dhash, error=error, warnings=warnings,
+            start_watermark=start_wm,
+            end_watermark=self.watermarks.get(ticker, interval),
+            requested_range=(start, end),
+            stages=tuple(stages),
+            records_ingested=records,
+            dataset_version=dversion,
+            dataset_hash=dhash,
+            error=error,
+            warnings=warnings,
         )
 
     def _result(self, **kwargs) -> PipelineRunResult:
         return PipelineRunResult(
-            run_id=kwargs["run_id"], instrument=kwargs["instrument"], interval=kwargs["interval"],
-            status=kwargs["status"], pipeline_config_version=self.config.pipeline.config_version,
-            start_watermark=kwargs["start_watermark"], end_watermark=None,
-            requested_range=kwargs["requested_range"], stages=kwargs["stages"],
-            records_ingested=kwargs["records_ingested"], dataset_version=None, dataset_hash=None,
-            error=kwargs["error"], warnings=[],
+            run_id=kwargs["run_id"],
+            instrument=kwargs["instrument"],
+            interval=kwargs["interval"],
+            status=kwargs["status"],
+            pipeline_config_version=self.config.pipeline.config_version,
+            start_watermark=kwargs["start_watermark"],
+            end_watermark=None,
+            requested_range=kwargs["requested_range"],
+            stages=kwargs["stages"],
+            records_ingested=kwargs["records_ingested"],
+            dataset_version=None,
+            dataset_hash=None,
+            error=kwargs["error"],
+            warnings=[],
         )
 
 
 def _build_source(config: AppConfig) -> HistoricalDataSource:
     from src.data.sources.yahoo import YahooFinanceSource
+
     if config.ingestion.source != "yahoo_finance":
         raise ValueError(f"no adapter for source {config.ingestion.source!r}")
     return YahooFinanceSource(timeout_s=config.ingestion.request_timeout_s)

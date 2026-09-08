@@ -162,9 +162,15 @@ class ModelRegistry:
         self._write_records(records)
         self._audit(
             AuditRecord(
-                audit_id=uuid.uuid4().hex, action="REGISTER", model_version=model_version,
-                previous_active=self._active_version(records), new_active=None,
-                reason="registered", actor="registry", timestamp=_now(), success=True,
+                audit_id=uuid.uuid4().hex,
+                action="REGISTER",
+                model_version=model_version,
+                previous_active=self._active_version(records),
+                new_active=None,
+                reason="registered",
+                actor="registry",
+                timestamp=_now(),
+                success=True,
             )
         )
         logger.info("model_registered", model_version=model_version, status=status)
@@ -296,19 +302,24 @@ class ModelRegistry:
         self._write_records(updated_records)
         self._audit(
             AuditRecord(
-                audit_id=uuid.uuid4().hex, action="PROMOTE", model_version=model_version,
-                previous_active=previous_active, new_active=model_version,
-                reason=reason or "promoted to ACTIVE", actor="registry",
-                timestamp=_now(), success=True,
+                audit_id=uuid.uuid4().hex,
+                action="PROMOTE",
+                model_version=model_version,
+                previous_active=previous_active,
+                new_active=model_version,
+                reason=reason or "promoted to ACTIVE",
+                actor="registry",
+                timestamp=_now(),
+                success=True,
             )
         )
-        logger.info(
-            "model_promoted", candidate=model_version, previous_active=previous_active
-        )
+        logger.info("model_promoted", candidate=model_version, previous_active=previous_active)
         plan["activated"] = True
         return plan
 
-    def rollback_model(self, target_version: str, *, dry_run: bool = False, reason: str = "") -> dict:
+    def rollback_model(
+        self, target_version: str, *, dry_run: bool = False, reason: str = ""
+    ) -> dict:
         """Roll back to a previously active model (integrity-checked)."""
         lock = PipelineLock(self.locks_dir / "promotion.lock")
         if not lock.acquire():
@@ -339,7 +350,12 @@ class ModelRegistry:
                 )
             updated_records = dict(records)
             updated_records[target_version] = ModelRecord(
-                **{**asdict(target), "status": "ACTIVE", "activated_at": _now(), "updated_at": _now()}
+                **{
+                    **asdict(target),
+                    "status": "ACTIVE",
+                    "activated_at": _now(),
+                    "updated_at": _now(),
+                }
             )
             if current_active is not None and current_active != target_version:
                 prev = records[current_active]
@@ -349,10 +365,15 @@ class ModelRegistry:
             self._write_records(updated_records)
             self._audit(
                 AuditRecord(
-                    audit_id=uuid.uuid4().hex, action="ROLLBACK", model_version=target_version,
-                    previous_active=current_active, new_active=target_version,
-                    reason=reason or "rollback", actor="registry",
-                    timestamp=_now(), success=True,
+                    audit_id=uuid.uuid4().hex,
+                    action="ROLLBACK",
+                    model_version=target_version,
+                    previous_active=current_active,
+                    new_active=target_version,
+                    reason=reason or "rollback",
+                    actor="registry",
+                    timestamp=_now(),
+                    success=True,
                 )
             )
             logger.info("model_rollback", target=target_version, previous_active=current_active)
@@ -386,9 +407,7 @@ class ModelRegistry:
     def _active_version(self, records: dict[str, ModelRecord]) -> str | None:
         actives = [name for name, r in records.items() if r.status == "ACTIVE"]
         if len(actives) > 1:
-            raise RegistryError(
-                f"registry invariant violated: multiple ACTIVE models {actives}"
-            )
+            raise RegistryError(f"registry invariant violated: multiple ACTIVE models {actives}")
         return actives[0] if actives else None
 
     def _artifact_dir(self, model_version: str) -> Path:
@@ -411,7 +430,7 @@ class ModelRegistry:
 
             joblib.load(model_file)
             return True
-        except Exception as error:
+        except Exception as error:  # noqa: BLE001 — integrity probe: any load failure means corrupt
             logger.warning("registry_artifact_load_failed", error=str(error))
             return False
 

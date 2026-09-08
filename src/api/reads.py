@@ -34,6 +34,8 @@ from src.logging.logger import get_logger
 
 logger = get_logger("api.reads")
 
+# B008 note: `Depends(...)` in argument defaults is the documented FastAPI
+# idiom for dependency injection; ruff's B008 is a false positive here.
 router = APIRouter(tags=["dashboard"])
 
 _active_config: AppConfig | None = None
@@ -59,7 +61,9 @@ def _read_json(path: Path) -> dict[str, Any]:
     try:
         return json.loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError) as error:
-        raise ApiError(SERVICE_NOT_READY, f"required metadata file is unreadable: {path.name}") from error
+        raise ApiError(
+            SERVICE_NOT_READY, f"required metadata file is unreadable: {path.name}"
+        ) from error
 
 
 def _dataset_root(config: AppConfig) -> Path:
@@ -207,7 +211,11 @@ def get_experiment(experiment_id: str, config: AppConfig = Depends(_get_config))
     if not directory.exists():
         raise ApiError(INVALID_REQUEST, f"experiment {experiment_id!r} does not exist")
     metadata = _read_json(directory / "metadata.json")
-    snapshot = _read_json(directory / "config_snapshot.json") if (directory / "config_snapshot.json").exists() else {}
+    snapshot = (
+        _read_json(directory / "config_snapshot.json")
+        if (directory / "config_snapshot.json").exists()
+        else {}
+    )
     importance_path = directory / "feature_importance.csv"
     importance: list[dict[str, Any]] = []
     if importance_path.exists():
@@ -452,44 +460,76 @@ def list_predictions(
 def system_status(config: AppConfig = Depends(_get_config)) -> dict[str, Any]:
     """Lightweight freshness/availability summary for the health page (§21)."""
     dataset_root = _dataset_root(config)
-    datasets = sorted(
-        (d for d in dataset_root.glob("dataset_*") if (d / "metadata.json").exists()),
-        key=lambda p: p.name,
-        reverse=True,
-    ) if dataset_root.exists() else []
+    datasets = (
+        sorted(
+            (d for d in dataset_root.glob("dataset_*") if (d / "metadata.json").exists()),
+            key=lambda p: p.name,
+            reverse=True,
+        )
+        if dataset_root.exists()
+        else []
+    )
     latest_dataset = _read_json(datasets[0] / "metadata.json") if datasets else None
     backtest_root = _backtest_root(config)
-    backtests = sorted(
-        (d for d in backtest_root.glob("bt_*") if (d / "metadata" / "experiment_record.json").exists()),
-        key=lambda p: p.name,
-        reverse=True,
-    ) if backtest_root.exists() else []
+    backtests = (
+        sorted(
+            (
+                d
+                for d in backtest_root.glob("bt_*")
+                if (d / "metadata" / "experiment_record.json").exists()
+            ),
+            key=lambda p: p.name,
+            reverse=True,
+        )
+        if backtest_root.exists()
+        else []
+    )
     model_root = _model_root(config)
-    models = sorted(
-        (d for d in model_root.glob("*") if d.is_dir() and (d / "model.joblib").exists() and d.name != "experiments"),
-        key=lambda p: p.name,
-        reverse=True,
-    ) if model_root.exists() else []
+    models = (
+        sorted(
+            (
+                d
+                for d in model_root.glob("*")
+                if d.is_dir() and (d / "model.joblib").exists() and d.name != "experiments"
+            ),
+            key=lambda p: p.name,
+            reverse=True,
+        )
+        if model_root.exists()
+        else []
+    )
     latest_model = _read_json(models[0] / "metadata.json") if models else None
-    experiments = sorted(
-        (d for d in (_model_root(config) / "experiments").glob("exp_*") if (d / "metadata.json").exists()),
-        key=lambda p: p.name,
-        reverse=True,
-    ) if (_model_root(config) / "experiments").exists() else []
+    experiments = (
+        sorted(
+            (
+                d
+                for d in (_model_root(config) / "experiments").glob("exp_*")
+                if (d / "metadata.json").exists()
+            ),
+            key=lambda p: p.name,
+            reverse=True,
+        )
+        if (_model_root(config) / "experiments").exists()
+        else []
+    )
     return {
-        "latest_dataset": {
-            "dataset_version": latest_dataset.get("version"),
-            "generated_at": latest_dataset.get("created_at"),
-            "quality_score": latest_dataset.get("quality_score"),
-        }
-        if latest_dataset
-        else None,
-        "latest_model": {
-            "model_version": latest_model.get("model_version"),
-            "training_timestamp": latest_model.get("training_timestamp"),
-        }
-        if latest_model
-        else None,
+        "latest_dataset": (
+            {
+                "dataset_version": latest_dataset.get("version"),
+                "generated_at": latest_dataset.get("created_at"),
+                "quality_score": latest_dataset.get("quality_score"),
+            }
+            if latest_dataset
+            else None
+        ),
+        "latest_model": (
+            {
+                "model_version": latest_model.get("model_version"),
+                "training_timestamp": latest_model.get("training_timestamp"),
+            }
+            if latest_model
+            else None
+        ),
         "latest_backtest": backtests[0].name if backtests else None,
         "latest_experiment": experiments[0].name if experiments else None,
         "counts": {
@@ -500,4 +540,3 @@ def system_status(config: AppConfig = Depends(_get_config)) -> dict[str, Any]:
         },
         "generated_at": datetime.now(timezone.utc).isoformat(),
     }
-

@@ -403,12 +403,12 @@ class PipelineConfig:
     """Autonomous data pipeline configuration (P01)."""
 
     config_version: str = "pipeline-config-v0.1"
-    lookback_days: int = 30          # default initial range when no watermark
-    overlap_days: int = 1            # ingestion safety overlap (deduped downstream)
-    retry_count: int = 2             # bounded transient retries per stage
+    lookback_days: int = 30  # default initial range when no watermark
+    overlap_days: int = 1  # ingestion safety overlap (deduped downstream)
+    retry_count: int = 2  # bounded transient retries per stage
     retry_delay_s: int = 5
     min_quality_score: float = 70.0  # quality gate minimum (dataset + cleaning)
-    max_gap_ratio: float = 0.05      # tolerated gap ratio before failure
+    max_gap_ratio: float = 0.05  # tolerated gap ratio before failure
     instruments: tuple[str, ...] = ()
 
 
@@ -442,11 +442,11 @@ class RetrainingConfig:
     """Controlled autonomous retraining configuration (P03)."""
 
     config_version: str = "retraining-config-v0.1"
-    cooldown_days: int = 7           # minimum days between retraining runs
-    min_train_rows: int = 100        # eligibility: minimum TRAIN rows
+    cooldown_days: int = 7  # minimum days between retraining runs
+    min_train_rows: int = 100  # eligibility: minimum TRAIN rows
     min_quality_score: float = 70.0  # eligibility: dataset quality gate
     # Promotion gates (risk-aware, documented baselines — never tuned on TEST)
-    min_f1_margin: float = 0.02        # G4: candidate F1 >= current - margin
+    min_f1_margin: float = 0.02  # G4: candidate F1 >= current - margin
     max_sharpe_regression: float = 0.10  # G5: candidate Sharpe >= current - margin
     max_drawdown_regression: float = 0.02  # G5: drawdown not worse by more than this
     model_name: str = "logistic_regression"  # approved baseline family
@@ -567,9 +567,7 @@ def _build_retraining(section: dict[str, Any]) -> RetrainingConfig:
 
     trigger_raw = section.get("trigger") or {}
     if not isinstance(trigger_raw, dict):
-        raise ConfigError(
-            "retraining.trigger must be a mapping", context={"value": trigger_raw}
-        )
+        raise ConfigError("retraining.trigger must be a mapping", context={"value": trigger_raw})
 
     def _flag(key: str, default: bool) -> bool:
         value = trigger_raw.get(key, default)
@@ -599,6 +597,7 @@ def _build_retraining(section: dict[str, Any]) -> RetrainingConfig:
 
 def _build_pipeline(section: dict[str, Any]) -> PipelineConfig:
     """Build the autonomous pipeline config (P01)."""
+
     def _num(key: str, default: float) -> float:
         value = section.get(key, default)
         if not isinstance(value, (int, float)) or isinstance(value, bool):
@@ -628,6 +627,7 @@ def _build_pipeline(section: dict[str, Any]) -> PipelineConfig:
 
 def _build_temporal(section: dict[str, Any]) -> TemporalConfig:
     """Build the temporal-model config (P06)."""
+
     def _num(key: str, default: float) -> float:
         value = section.get(key, default)
         if not isinstance(value, (int, float)) or isinstance(value, bool):

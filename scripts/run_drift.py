@@ -48,7 +48,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(f"configuration error: {error.message}", file=sys.stderr)
         return 2
     configure_from_config(config)
-    logger = get_logger("drift.cli")
+    get_logger("drift.cli")
 
     engine = DriftEngine(config)
 

@@ -41,10 +41,19 @@ def main(argv: Sequence[str] | None = None) -> int:
     engine = OperationsEngine(config)
 
     if args.acknowledge:
-        print(json.dumps({"event_id": args.acknowledge, "acknowledged": engine.acknowledge_event(args.acknowledge)}))
+        print(
+            json.dumps(
+                {
+                    "event_id": args.acknowledge,
+                    "acknowledged": engine.acknowledge_event(args.acknowledge),
+                }
+            )
+        )
         return 0
     if args.resolve:
-        print(json.dumps({"event_id": args.resolve, "resolved": engine.resolve_event(args.resolve)}))
+        print(
+            json.dumps({"event_id": args.resolve, "resolved": engine.resolve_event(args.resolve)})
+        )
         return 0
     if args.snapshot:
         snapshot = engine.snapshot()

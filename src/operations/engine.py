@@ -14,7 +14,7 @@ from __future__ import annotations
 import json
 import uuid
 from dataclasses import asdict, dataclass, field
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from pathlib import Path
 
 from src.config.loader import AppConfig
@@ -161,7 +161,8 @@ class OperationsEngine:
         runs_dir = self.state_dir / "pipeline" / "runs"
         if not runs_dir.exists():
             return ComponentHealth(
-                component="data_pipeline", status="UNKNOWN",
+                component="data_pipeline",
+                status="UNKNOWN",
                 detail="no pipeline runs recorded yet",
             )
         runs = []
@@ -171,17 +172,19 @@ class OperationsEngine:
             except (OSError, ValueError):
                 continue
         if not runs:
-            return ComponentHealth(component="data_pipeline", status="UNKNOWN", detail="runs unreadable")
+            return ComponentHealth(
+                component="data_pipeline", status="UNKNOWN", detail="runs unreadable"
+            )
         failures = sum(1 for r in runs if r.get("status") == "FAILED")
         successes = [r for r in runs if r.get("status") == "COMPLETED"]
         last_run = runs[-1]
         last_success = successes[-1]["created_at"] if successes else None
-        last_failure = next((r["created_at"] for r in reversed(runs) if r.get("status") == "FAILED"), None)
+        last_failure = next(
+            (r["created_at"] for r in reversed(runs) if r.get("status") == "FAILED"), None
+        )
         if failures >= REPEATED_PIPELINE_FAILURES:
             status = "CRITICAL"
-        elif failures and not successes:
-            status = "DEGRADED"
-        elif last_run.get("status") == "FAILED":
+        elif failures and not successes or last_run.get("status") == "FAILED":
             status = "DEGRADED"
         else:
             status = "HEALTHY"
@@ -200,17 +203,23 @@ class OperationsEngine:
         summary_path = self.state_dir / "monitoring" / "summaries" / "latest.json"
         if not summary_path.exists():
             return ComponentHealth(
-                component="drift_monitor", status="NOT_CONFIGURED",
+                component="drift_monitor",
+                status="NOT_CONFIGURED",
                 detail="no drift checks recorded",
             )
         try:
             summary = json.loads(summary_path.read_text(encoding="utf-8"))
         except (OSError, ValueError):
-            return ComponentHealth(component="drift_monitor", status="UNKNOWN", detail="summary unreadable")
+            return ComponentHealth(
+                component="drift_monitor", status="UNKNOWN", detail="summary unreadable"
+            )
         health = summary.get("health", "UNKNOWN")
-        status = {"HEALTHY": "HEALTHY", "DEGRADED": "DEGRADED", "CRITICAL": "CRITICAL"}.get(health, "UNKNOWN")
+        status = {"HEALTHY": "HEALTHY", "DEGRADED": "DEGRADED", "CRITICAL": "CRITICAL"}.get(
+            health, "UNKNOWN"
+        )
         return ComponentHealth(
-            component="drift_monitor", status=status,
+            component="drift_monitor",
+            status=status,
             detail=f"open critical={summary.get('open_critical', 0)}, open warning={summary.get('open_warning', 0)}",
         )
 
@@ -218,7 +227,8 @@ class OperationsEngine:
         runs_dir = self.state_dir / "retraining"
         if not runs_dir.exists():
             return ComponentHealth(
-                component="retraining", status="NOT_CONFIGURED",
+                component="retraining",
+                status="NOT_CONFIGURED",
                 detail="no retraining runs recorded",
             )
         runs = []
@@ -228,13 +238,16 @@ class OperationsEngine:
             except (OSError, ValueError):
                 continue
         if not runs:
-            return ComponentHealth(component="retraining", status="UNKNOWN", detail="runs unreadable")
+            return ComponentHealth(
+                component="retraining", status="UNKNOWN", detail="runs unreadable"
+            )
         failed = sum(1 for r in runs if r.get("status") == "FAILED")
         approved = sum(1 for r in runs if r.get("decision") == "CANDIDATE_APPROVED")
         last = runs[-1]
         status = "CRITICAL" if failed >= 3 else ("DEGRADED" if failed else "HEALTHY")
         return ComponentHealth(
-            component="retraining", status=status,
+            component="retraining",
+            status=status,
             last_run=last.get("completed_at") or last.get("started_at"),
             error_count=failed,
             detail=f"last={last.get('status')}, approved={approved}, failed={failed}",
@@ -279,7 +292,8 @@ class OperationsEngine:
         }
         return (
             ComponentHealth(
-                component="model_registry", status="HEALTHY",
+                component="model_registry",
+                status="HEALTHY",
                 last_success=active.activated_at,
                 detail=f"active={active.model_version}",
             ),
@@ -294,9 +308,13 @@ class OperationsEngine:
             probe = processed / ".ops_probe"
             probe.write_text("ok", encoding="utf-8")
             probe.unlink()
-            return ComponentHealth(component="storage", status="HEALTHY", detail="processed tier writable")
+            return ComponentHealth(
+                component="storage", status="HEALTHY", detail="processed tier writable"
+            )
         except OSError as error:
-            return ComponentHealth(component="storage", status="CRITICAL", detail=f"storage failure: {error}")
+            return ComponentHealth(
+                component="storage", status="CRITICAL", detail=f"storage failure: {error}"
+            )
 
     def _data_freshness(self) -> dict:
         """Freshness from pipeline run records (weekends are not staleness)."""
@@ -313,7 +331,13 @@ class OperationsEngine:
                     break
         component_status = "UNKNOWN"
         detail = "no completed pipeline runs"
-        freshness: dict = {"component": None, "latest_run": None, "lag_days": None, "status": component_status, "detail": detail}
+        freshness: dict = {
+            "component": None,
+            "latest_run": None,
+            "lag_days": None,
+            "status": component_status,
+            "detail": detail,
+        }
         if latest is not None:
             try:
                 last_ts = datetime.fromisoformat(latest["created_at"])
@@ -346,9 +370,17 @@ class OperationsEngine:
         events: list[OpsEvent] = []
         for component in components:
             if component.status == "CRITICAL":
-                events.append(self._event(component.component, "COMPONENT_CRITICAL", "CRITICAL", component.detail))
+                events.append(
+                    self._event(
+                        component.component, "COMPONENT_CRITICAL", "CRITICAL", component.detail
+                    )
+                )
             elif component.status == "DEGRADED":
-                events.append(self._event(component.component, "COMPONENT_DEGRADED", "WARNING", component.detail))
+                events.append(
+                    self._event(
+                        component.component, "COMPONENT_DEGRADED", "WARNING", component.detail
+                    )
+                )
         return events
 
     def _event(self, component: str, event_type: str, severity: str, message: str) -> OpsEvent:
@@ -386,8 +418,11 @@ class OperationsEngine:
             if prior is not None:
                 merged.append(
                     OpsEvent(
-                        **{**asdict(prior), "last_seen": event.timestamp,
-                           "occurrence_count": prior.occurrence_count + 1}
+                        **{
+                            **asdict(prior),
+                            "last_seen": event.timestamp,
+                            "occurrence_count": prior.occurrence_count + 1,
+                        }
                     )
                 )
             else:

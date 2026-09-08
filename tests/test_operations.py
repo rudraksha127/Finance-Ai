@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import replace
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
@@ -27,7 +27,9 @@ def ops_config(tmp_path: Path):
 
 @pytest.fixture()
 def ops_engine(ops_config, tmp_path: Path):
-    return OperationsEngine(ops_config, operations_dir=tmp_path / "ops", state_dir=tmp_path / "data")
+    return OperationsEngine(
+        ops_config, operations_dir=tmp_path / "ops", state_dir=tmp_path / "data"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -81,7 +83,7 @@ def test_np_busdays_ignores_weekends():
 def test_freshness_healthy_within_window(ops_config, tmp_path):
     runs = tmp_path / "data" / "pipeline" / "runs"
     runs.mkdir(parents=True)
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc).replace(tzinfo=None)
     (runs / "run1.json").write_text(
         json.dumps(
             {
@@ -105,7 +107,7 @@ def test_freshness_healthy_within_window(ops_config, tmp_path):
 def test_freshness_stale_is_critical(ops_config, tmp_path):
     runs = tmp_path / "data" / "pipeline" / "runs"
     runs.mkdir(parents=True)
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc).replace(tzinfo=None)
     (runs / "run1.json").write_text(
         json.dumps(
             {
@@ -179,7 +181,6 @@ def test_event_persistence_is_append_only(ops_engine, tmp_path):
 # ---------------------------------------------------------------------------
 def test_monitoring_storage_failure_does_not_break_core(ops_engine, tmp_path, monkeypatch):
     """Observability must not become a single point of failure."""
-    from src.operations.engine import ComponentHealth
 
     def _boom(*args, **kwargs):
         raise OSError("disk full")

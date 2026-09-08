@@ -25,17 +25,28 @@ from pathlib import Path
 
 from src.config.loader import AppConfig
 from src.logging.logger import get_logger
-from src.pipeline.lock import PipelineLock
 
 logger = get_logger("retraining.engine")
 
 RUN_STATES = (
-    "NOT_TRIGGERED", "TRIGGERED", "SKIPPED", "RUNNING",
-    "EVALUATING", "APPROVED", "REJECTED", "FAILED",
+    "NOT_TRIGGERED",
+    "TRIGGERED",
+    "SKIPPED",
+    "RUNNING",
+    "EVALUATING",
+    "APPROVED",
+    "REJECTED",
+    "FAILED",
 )
-GATES = ("G1_DATA_QUALITY", "G2_TRAINING_VALIDITY", "G3_PREDICTION_SANITY",
-         "G4_PREDICTIVE_QUALITY", "G5_FINANCIAL_PERFORMANCE", "G6_ROBUSTNESS",
-         "G7_OPERATIONAL_HEALTH")
+GATES = (
+    "G1_DATA_QUALITY",
+    "G2_TRAINING_VALIDITY",
+    "G3_PREDICTION_SANITY",
+    "G4_PREDICTIVE_QUALITY",
+    "G5_FINANCIAL_PERFORMANCE",
+    "G6_ROBUSTNESS",
+    "G7_OPERATIONAL_HEALTH",
+)
 
 
 @dataclass(frozen=True)
@@ -106,8 +117,12 @@ class RetrainingEngine:
 
         # --- Eligibility ------------------------------------------------
         skip_reason = self._eligibility_failure(
-            dataset_version, feature_version, label_version, fingerprint,
-            drift_critical=drift_critical, performance_critical=performance_critical,
+            dataset_version,
+            feature_version,
+            label_version,
+            fingerprint,
+            drift_critical=drift_critical,
+            performance_critical=performance_critical,
         )
         if skip_reason is not None:
             return self._record(
@@ -160,7 +175,7 @@ class RetrainingEngine:
                 model_version=candidate_version,
                 experiment_id=f"retrain_{run_id[:8]}",
             )
-        except Exception as error:  # training failure -> FAILED, model unchanged
+        except Exception as error:  # noqa: BLE001 — training failure -> FAILED, model unchanged
             logger.error("retraining_candidate_training_failed", error=str(error))
             return self._record(
                 RetrainingRun(
@@ -254,7 +269,10 @@ class RetrainingEngine:
         # Cooldown + idempotency (milestone §7/§29)
         last = self._last_run()
         if last is not None:
-            if last.get("fingerprint") == fingerprint and last.get("status") in ("APPROVED", "REJECTED"):
+            if last.get("fingerprint") == fingerprint and last.get("status") in (
+                "APPROVED",
+                "REJECTED",
+            ):
                 return f"identical candidate already evaluated ({last.get('decision')})"
             completed_at = last.get("completed_at") or last.get("started_at") or ""
             if completed_at:
@@ -272,7 +290,9 @@ class RetrainingEngine:
     # ------------------------------------------------------------------
     # Gates (milestone §18/§19) — measurable criteria only
     # ------------------------------------------------------------------
-    def _evaluate_gates(self, *, candidate, candidate_version, dataset_version, feature_version, label_version):
+    def _evaluate_gates(
+        self, *, candidate, candidate_version, dataset_version, feature_version, label_version
+    ):
         cfg = self.config.retraining
         gates: list[GateResult] = []
         comparison: dict = {}
@@ -310,7 +330,11 @@ class RetrainingEngine:
             GateResult(
                 gate="G2_TRAINING_VALIDITY",
                 status="PASS" if ok else "FAIL",
-                detail="artifact metadata matches requested versions" if ok else "artifact missing or version mismatch",
+                detail=(
+                    "artifact metadata matches requested versions"
+                    if ok
+                    else "artifact missing or version mismatch"
+                ),
             )
         )
 
@@ -359,16 +383,31 @@ class RetrainingEngine:
         cur_dd = cur_fin.get("max_drawdown")
         comparison["financial"] = {"candidate": cand_fin, "current": cur_fin}
         g5_pass = True
-        g5_detail = "backtest metrics unavailable on one/both sides (zero-trade runs are legitimate)"
-        if cand_sharpe is not None and cur_sharpe is not None:
-            if cand_sharpe < cur_sharpe - cfg.max_sharpe_regression:
-                g5_pass = False
-                g5_detail = f"candidate Sharpe {cand_sharpe:.4f} regresses current {cur_sharpe:.4f}"
-        if g5_pass and cand_dd is not None and cur_dd is not None:
-            if cand_dd < cur_dd - cfg.max_drawdown_regression:
-                g5_pass = False
-                g5_detail = f"candidate drawdown {cand_dd:.4f} worse than current {cur_dd:.4f}"
-        gates.append(GateResult(gate="G5_FINANCIAL_PERFORMANCE", status="PASS" if g5_pass else "FAIL", detail=g5_detail))
+        g5_detail = (
+            "backtest metrics unavailable on one/both sides (zero-trade runs are legitimate)"
+        )
+        if (
+            cand_sharpe is not None
+            and cur_sharpe is not None
+            and cand_sharpe < cur_sharpe - cfg.max_sharpe_regression
+        ):
+            g5_pass = False
+            g5_detail = f"candidate Sharpe {cand_sharpe:.4f} regresses current {cur_sharpe:.4f}"
+        if (
+            g5_pass
+            and cand_dd is not None
+            and cur_dd is not None
+            and cand_dd < cur_dd - cfg.max_drawdown_regression
+        ):
+            g5_pass = False
+            g5_detail = f"candidate drawdown {cand_dd:.4f} worse than current {cur_dd:.4f}"
+        gates.append(
+            GateResult(
+                gate="G5_FINANCIAL_PERFORMANCE",
+                status="PASS" if g5_pass else "FAIL",
+                detail=g5_detail,
+            )
+        )
 
         # G6 robustness: VAL metrics exist (multi-window evaluation proxy)
         g6 = bool(metrics.get("precision_macro")) and bool(metrics.get("recall_macro"))
@@ -376,7 +415,11 @@ class RetrainingEngine:
             GateResult(
                 gate="G6_ROBUSTNESS",
                 status="PASS" if g6 else "FAIL",
-                detail="per-class metrics available for multi-window review" if g6 else "insufficient metric detail",
+                detail=(
+                    "per-class metrics available for multi-window review"
+                    if g6
+                    else "insufficient metric detail"
+                ),
             )
         )
 
@@ -386,13 +429,19 @@ class RetrainingEngine:
 
             load_model(self.config, candidate_version)
             g7_pass, g7_detail = True, "artifact loads through the standard resolver"
-        except Exception as error:
+        except Exception as error:  # noqa: BLE001 — gate probe: any load failure fails G7
             g7_pass, g7_detail = False, f"artifact load failed: {error}"
-        gates.append(GateResult(gate="G7_OPERATIONAL_HEALTH", status="PASS" if g7_pass else "FAIL", detail=g7_detail))
+        gates.append(
+            GateResult(
+                gate="G7_OPERATIONAL_HEALTH", status="PASS" if g7_pass else "FAIL", detail=g7_detail
+            )
+        )
         return gates, comparison
 
     # ------------------------------------------------------------------
-    def _financial_metrics(self, *, model_version, dataset_version, feature_version, label_version) -> dict:
+    def _financial_metrics(
+        self, *, model_version, dataset_version, feature_version, label_version
+    ) -> dict:
         """Run the shared static backtest engine on the TEST split."""
         if model_version is None:
             return {}
@@ -408,7 +457,7 @@ class RetrainingEngine:
                 split="test",
             )
             return dict(result.financial_metrics)
-        except Exception as error:
+        except Exception as error:  # noqa: BLE001 — probe: unavailable backtest degrades to {}
             logger.warning("retraining_backtest_unavailable", error=str(error))
             return {}
 

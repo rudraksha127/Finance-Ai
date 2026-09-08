@@ -46,7 +46,7 @@ class PipelineLock:
         except FileNotFoundError:
             pass
 
-    def __enter__(self) -> "PipelineLock":
+    def __enter__(self) -> PipelineLock:  # noqa: PYI034 — returns self by design
         if not self.acquire():
             raise RuntimeError(f"pipeline lock already held: {self.path}")
         return self
