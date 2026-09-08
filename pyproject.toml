@@ -1,0 +1,35 @@
+# ============================================
+# Finance AI — Tooling Configuration
+# Line length 100 per docs/ENGINEERING_CONSTITUTION.md
+# ============================================
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-ra"
+
+[tool.coverage.run]
+source = ["src"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+
+[tool.black]
+line-length = 100
+target-version = ["py310"]
+
+[tool.isort]
+profile = "black"
+line_length = 100
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint.per-file-ignores]
+# Naive datetimes are intentional in tests: the approved storage policy
+# stores naive-UTC timestamps (DATA_ARCHITECTURE.md section 4.2), and the
+# tests must construct naive values to exercise that policy.
+"tests/**/*.py" = ["DTZ001"]

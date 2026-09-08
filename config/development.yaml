@@ -1,0 +1,16 @@
+# ============================================
+# Finance AI — Development Environment Overrides
+# ============================================
+# Layered on top of config/default.yaml (see src/config/loader.py).
+# Only add values here that genuinely differ from the defaults for
+# local development (e.g., console logging for readability).
+
+# The M11 integration research run (2026-09-08) produced features/labels/
+# dataset at v0.3; keep development aligned with the live artifacts so the
+# API's configured-version checks match the newest trained models.
+dataset:
+  label_version: "v0.3"
+features:
+  version: "v0.3"
+dataset_builder:
+  dataset_version: "v0.3"

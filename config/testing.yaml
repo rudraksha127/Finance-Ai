@@ -1,0 +1,11 @@
+# ============================================
+# Finance AI — Testing Environment Overrides
+# ============================================
+# Layered on top of config/default.yaml when ENVIRONMENT=testing.
+# Tests generally load their own fixture configuration; this file is
+# the override source for any test that exercises the real config dir.
+#
+# Only add values here that genuinely differ from default.yaml, e.g.:
+#
+# logging:
+#   level: WARNING

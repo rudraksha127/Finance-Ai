@@ -1,0 +1,20 @@
+# Fixture base configuration for config-loader tests.
+project:
+  name: finance-ai-fixture
+  version: "9.9.9"
+  description: Fixture base config used by tests
+
+data:
+  raw_dir: data/fixture_raw
+  interim_dir: data/fixture_interim
+  processed_dir: data/fixture_processed
+  external_dir: data/fixture_external
+  default_format: csv
+
+logging:
+  level: INFO
+  format: json
+
+# Unknown sections (future milestones) must be tolerated by the loader.
+future_section:
+  anything: true

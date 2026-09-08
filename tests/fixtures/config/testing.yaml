@@ -1,0 +1,8 @@
+# Fixture testing-environment overlay for config-loader tests.
+# Overrides only data.raw_dir and logging.level; everything else
+# must come from default.yaml via deep merge.
+data:
+  raw_dir: data/fixture_testing_raw
+
+logging:
+  level: DEBUG

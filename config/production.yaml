@@ -1,0 +1,12 @@
+# ============================================
+# Finance AI — Production Environment Overrides (Future)
+# ============================================
+# Layered on top of config/default.yaml when ENVIRONMENT=production.
+# The MVP is NOT deployed to production (local execution only).
+# No secrets belong in this file — secrets arrive via environment
+# variables. When production deployment is approved, review every
+# value here before uncommenting:
+#
+# logging:
+#   level: INFO
+#   format: json

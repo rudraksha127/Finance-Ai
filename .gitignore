@@ -1,0 +1,107 @@
+# ============================================
+# Finance AI — .gitignore
+# ============================================
+
+# --- Environment & Secrets ---
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+secrets.yaml
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+*.egg
+dist/
+build/
+eggs/
+*.whl
+pip-log.txt
+pip-delete-this-directory.txt
+
+# --- Virtual Environment ---
+venv/
+.venv/
+env/
+ENV/
+
+# --- IDE ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# --- Data (large files) ---
+data/raw/*
+data/interim/*
+data/processed/*
+data/external/*
+!data/raw/.gitkeep
+!data/interim/.gitkeep
+!data/processed/.gitkeep
+!data/external/.gitkeep
+
+# --- Runtime operational state (regenerable) ---
+data/metadata/
+data/pipeline/
+data/monitoring/
+data/retraining/
+data/operations/
+data/predictions/
+
+# --- Node / Frontend ---
+node_modules/
+dashboard/node_modules/
+dashboard/dist/
+*.tsbuildinfo
+
+# --- Model Artifacts ---
+models/*.pkl
+models/*.joblib
+models/*.h5
+models/*.pt
+models/*.bin
+models/*.onnx
+models/*.json
+!models/.gitkeep
+
+# --- Experiment Logs ---
+experiments/*.log
+experiments/*.json
+!experiments/.gitkeep
+
+# --- Backtest Outputs (generated) ---
+backtests/*
+!backtests/.gitkeep
+
+# --- Reports (generated) ---
+reports/*.html
+reports/*.pdf
+reports/*.png
+reports/*.jpg
+!reports/.gitkeep
+
+# --- Jupyter ---
+.ipynb_checkpoints/
+
+# --- Testing ---
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+
+# --- mypy ---
+.mypy_cache/
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+Desktop.ini

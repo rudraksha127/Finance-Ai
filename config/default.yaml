@@ -1,0 +1,273 @@
+# ============================================
+# Finance AI — Default Configuration
+# ============================================
+# This is the base configuration for all environments.
+# Override values in environment-specific files.
+
+project:
+  name: finance-ai-mvp
+  version: "0.1.0"
+  description: "Research-grade ML system for financial prediction"
+
+# --- Data Layer (Future) ---
+data:
+  raw_dir: data/raw
+  interim_dir: data/interim
+  processed_dir: data/processed
+  external_dir: data/external
+  # Supported formats: csv, parquet
+  default_format: csv
+
+# --- Processing Layer (Future) ---
+processing:
+  # Missing data strategy: drop, fill_mean, fill_median, fill_forward, interpolate
+  missing_strategy: fill_forward
+  # Maximum percentage of missing values allowed per column
+  max_missing_pct: 0.3
+  # Outlier detection: none, zscore, iqr
+  outlier_method: none
+
+# --- Feature Layer (FEATURE_ENGINEERING_BLUEPRINT.md) ---
+features:
+  # Feature-set version (v{major}.{minor}); bump whenever a feature
+  # definition changes (blueprint section 16)
+  version: "v0.1"
+  # Approved MVP output format (blueprint section 18: Parquet)
+  output_format: parquet
+  validation:
+    # FVAL-01: max NaN ratio per feature before warning
+    max_nan_ratio: 0.30
+    # FVAL-02: infinite values are rejected (must be 0)
+    max_infinite: 0
+    # FVAL-03: enforce documented ranges for bounded features
+    check_bounded_ranges: true
+    # FVAL-06: outlier detection threshold (|z|)
+    outlier_zscore_threshold: 5.0
+
+# --- Dataset Layer (LABEL_GENERATION_BLUEPRINT.md) ---
+dataset:
+  # Label type: classification (UP/DOWN/HOLD), regression (future)
+  label_type: classification
+  # Forward window for label generation (in trading days) — blueprint section 5
+  label_window: 5
+  # Fixed classification thresholds (blueprint section 4.4); never tuned on test data
+  thresholds:
+    up: 0.01
+    down: 0.01
+  # Label set version (v{major}.{minor}); bump on target/threshold/horizon changes
+  label_version: "v0.1"
+  # Price column for future-return labels (blueprint 12.2: adjusted prices)
+  price_column: adj_close
+  # Train/val/test split ratios (chronological) — shared by the Dataset
+  # Builder (DATASET_BUILDER_BLUEPRINT.md section 3)
+  split_ratios:
+    train: 0.7
+    val: 0.15
+    test: 0.15
+
+# --- Dataset Builder (DATASET_BUILDER_BLUEPRINT.md) ---
+dataset_builder:
+  # Output (dataset) version; bump on any material change to source data,
+  # feature set, labels, split policy, or filtering policy (blueprint 6.1)
+  dataset_version: "v0.1"
+  # Data-quality gate for the built dataset (blueprint 9.1 DVAL-10)
+  min_quality_score: 70
+  # Minimum rows per split before warning (blueprint 3.4; train >= 100,
+  # val >= 20, test >= 20 are WARNINGs, not errors)
+  min_split_rows:
+    train: 100
+    val: 20
+    test: 20
+  # Purging/embargo — blueprint 5.3: the MVP STATIC split uses NO purge and
+  # NO embargo (contiguous, non-overlapping observations). The knobs below
+  # exist for the walk-forward/backtest engine (later milestone) where
+  # overlapping label windows require purging; both default to disabled.
+  purging:
+    enabled: false
+  embargo:
+    enabled: false
+    rows: 0
+
+# --- Model Layer (Milestone 07) ---
+model:
+  random_seed: 42
+  artifact_dir: data/processed/models
+  config_version: model-config-v0.1
+  n_jobs: 1
+  models:
+    - name: logistic_regression
+      type: linear
+      params:
+        C: 1.0
+        penalty: l2
+        solver: lbfgs
+        max_iter: 1000
+        class_weight: balanced
+    - name: random_forest
+      type: ensemble
+      params:
+        n_estimators: 100
+        max_depth: 10
+        min_samples_split: 5
+        min_samples_leaf: 2
+    - name: lightgbm
+      type: ensemble
+      params:
+        n_estimators: 500
+        max_depth: 6
+        learning_rate: 0.05
+        num_leaves: 31
+        subsample: 0.8
+        colsample_bytree: 0.8
+        class_weight: balanced
+        random_state: 42
+    - name: xgboost
+      type: ensemble
+      params:
+        n_estimators: 500
+        max_depth: 6
+        learning_rate: 0.05
+        subsample: 0.8
+        colsample_bytree: 0.8
+        eval_metric: mlogloss
+        random_state: 42
+
+# --- Inference API (INFERENCE_API_BLUEPRINT.md section 22) ---
+api:
+  host: 127.0.0.1          # local only (NFR-SE-04)
+  port: 8000
+  mode: research           # research | paper  (live is REJECTED at startup)
+  default_model: ""        # empty -> first available trained model artifact
+  inference_timeout_ms: 1000
+  max_request_size_kb: 256
+  rate_limit_per_minute: 0 # 0 = disabled
+  audit_dir: predictions/audit
+  model_cache_size: 2      # in-memory model cache (blueprint section 13)
+  stale_data_max_age_seconds: 300
+
+# --- Backtest (EVALUATION_BACKTESTING_BLUEPRINT.md) ---
+backtest:
+  backtest_version: v0.1          # material backtest-assumption changes force a new version
+  strategy_version: stg_v0.1      # frozen strategy rules version
+  cost_model_version: cost_v0.1   # cost assumptions version
+  execution_convention: close_to_close  # MVP simplification (blueprint section 10)
+  initial_capital: 1.0            # normalized equity basis (quantity-based MVP position model)
+  signal:
+    # P(UP) >= buy_threshold -> BUY; P(DOWN) >= sell_threshold -> SELL (exit)
+    # Default 0.55 per ADR-0019 (RISK_DECISION_ENGINE_BLUEPRINT section 6)
+    buy_threshold: 0.55
+    sell_threshold: 0.55
+  position:
+    quantity: 1.0          # fixed quantity (blueprint section 13)
+    max_holding_period: 5  # trading rows, matches label horizon
+  costs:
+    # 10 bps per side, 20 bps round-trip (PRD FR-BT-03, blueprint section 11)
+    # spread_bps is the combined spread+slippage bucket (blueprint 11.2/12.1)
+    brokerage_bps: 5
+    spread_bps: 5
+    slippage_bps: 0
+  annualization: 252       # trading days per year for daily data
+  risk_free_rate: 0.0      # MVP (no risk-free-rate data; blueprint 15.2)
+  output_dir: backtests
+  walkforward:
+    enabled: false         # run with --walk-forward or set true
+    train_window: 252      # expanding-window initial train size
+    test_window: 21        # test fold size
+    step: 21               # fold step
+    purge: true            # drop train rows whose label window overlaps the fold test
+    embargo_rows: 0        # MVP: 0 for daily data (blueprint section 9.3)
+
+# --- Autonomous Data Pipeline (Post-MVP Milestone 01) ---
+pipeline:
+  # Versioned automation configuration; bump on material behavior changes
+  config_version: pipeline-config-v0.1
+  # Default initial lookback (calendar days) when no watermark exists
+  lookback_days: 30
+  # Ingestion safety overlap in days (duplicates are deduped downstream)
+  overlap_days: 1
+  # Bounded retries for transient stage failures
+  retry_count: 2
+  retry_delay_s: 5
+  # Quality gate: minimum dataset quality score to publish a version
+  min_quality_score: 70
+  # Tolerated missing-business-day ratio before the gate fails
+  max_gap_ratio: 0.05
+  # Instruments for scheduled runs (manual runs override)
+  instruments: []
+
+# --- Autonomous Retraining (Post-MVP Milestone 03) ---
+retraining:
+  config_version: retraining-config-v0.1
+  # Minimum days between retraining runs (loop protection)
+  cooldown_days: 7
+  # Eligibility: minimum TRAIN rows and dataset quality gate
+  min_train_rows: 100
+  min_quality_score: 70
+  # Promotion gates (risk-aware margins; research baselines, not tuned on TEST)
+  min_f1_margin: 0.02           # candidate F1_macro >= current - margin
+  max_sharpe_regression: 0.10   # candidate Sharpe >= current - margin
+  max_drawdown_regression: 0.02 # candidate max drawdown not worse by more than this
+  # Approved model family for candidates (no automatic architecture expansion)
+  model_name: logistic_regression
+  trigger:
+    dataset_growth: true
+    drift_critical: true
+    performance_critical: true
+
+# --- Logging ---
+logging:
+  level: INFO
+  format: json
+
+# --- Reproducibility ---
+reproducibility:
+  random_seed: 42
+  log_config: true
+  log_versions: true
+
+# --- Ingestion (DATA_INGESTION_BLUEPRINT.md) ---
+ingestion:
+  # Implemented historical source (only Yahoo Finance in this milestone)
+  source: yahoo_finance
+  interval: 1d          # 1d | 1wk | 1mo
+  request_timeout_s: 30
+  # Simple rate-limit courtesy: minimum delay between source requests
+  delay_between_requests_ms: 500
+  # Continue ingesting remaining tickers when one fails
+  continue_on_failure: true
+  # Raw tier format (CSV in this milestone)
+  raw_format: csv
+  retry:
+    max_retries: 3      # bounded retries for transient failures
+    base_delay_s: 1.0   # exponential backoff base
+    max_delay_s: 60.0
+    retry_429_delay_s: 60.0  # default wait when HTTP 429 has no Retry-After
+
+# --- Cleaning & Quality (DATA_CLEANING_VALIDATION.md) ---
+cleaning:
+  pipeline_version: "0.1.0"
+  min_rows: 2
+  # Optional reference file under data/external/: JSON list of ISO holiday dates.
+  # If unset, only weekend detection is applied (no holiday calendar).
+  holidays_file: null
+  validation:
+    max_missing_pct: 0.30
+    max_price_change_pct: 0.50
+  cleaning:
+    duplicate_strategy: keep_last
+    missing_fill_limit: 3
+    interpolate_max_gap: 3
+    outlier_zscore_threshold: 3.0
+    apply_corporate_actions: true
+  quality:
+    enabled: true
+    min_score: 70
+    weights:
+      completeness: 0.30
+      validity: 0.30
+      consistency: 0.20
+      freshness: 0.10
+      uniqueness: 0.10
+    freshness_max_days: 50
+  audit:
+    enabled: true
