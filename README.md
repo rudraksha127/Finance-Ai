@@ -417,6 +417,31 @@ Research-only: weak validation metrics on the small MVP dataset are reported
 as-is, never tuned against the test set. See
 `docs/TEMPORAL_MODEL_IMPLEMENTATION.md`.
 
+## Multimodal Data (Post-MVP 08)
+
+Point-in-time external data layer (fundamentals + events/news) with STRICT
+availability semantics: every record carries event/publication/ingestion/
+**availability** timestamps, and a prediction at time T sees only records with
+`availability_timestamp <= T`. No licensed fundamentals/news source is
+currently approved, so the layer runs on deterministic offline fixtures
+(research mode; no network access) — wiring a provider later means adding one
+adapter. Event type taxonomy, dedup, and restatement policy ("first
+publication is truth") are documented in
+`docs/MULTIMODAL_FINANCE_DATA_IMPLEMENTATION.md`.
+
+```python
+from pathlib import Path
+from src.multimodal.sources import load_fixture
+from src.multimodal.features import build_multimodal_features
+
+records = load_fixture(Path("data/external/fixtures/multimodal_reference.json"))
+features = build_multimodal_features(market_frame, records, instrument="AAPL")
+```
+
+All six mandatory leakage tests (publication-time, future news, future filing,
+as-of, dataset extension, same-day timing) pass. `feature_set_v0.2` is
+additive — the market-only v0.1 feature set is never mutated.
+
 ## Testing
 
 ```bash

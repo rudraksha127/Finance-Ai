@@ -70,8 +70,11 @@ production predictions, and must not be used for live trading.
 
 ## Post-MVP Roadmap
 
-1. **P01** Autonomous data ingestion & incremental dataset growth
-2. **P02** Data & model drift detection engine
-3. **P03** Autonomous retraining & candidate evaluation
-4. **P04** Model registry & safe promotion
-5. **P05** Observability & operations center
+1. **P01** Autonomous data ingestion & incremental dataset growth — COMPLETE
+2. **P02** Data & model drift detection engine — COMPLETE
+3. **P03** Autonomous retraining & candidate evaluation — COMPLETE
+4. **P04** Model registry & safe promotion — COMPLETE
+5. **P05** Observability & operations center — COMPLETE
+6. **P06** Temporal intelligence model (LSTM) — COMPLETE (registered CANDIDATE)
+7. **P07** Model ensemble & probability calibration — COMPLETE (ensemble CANDIDATE, not promoted)
+8. **P08** Multimodal finance intelligence (fundamentals + events, point-in-time) — COMPLETE (fixture-only external data; experiments await a licensed source)
