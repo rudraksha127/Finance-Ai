@@ -470,5 +470,7 @@ ruff check src tests scripts
 | `docs/MODEL_REGISTRY_IMPLEMENTATION.md` | Post-MVP 04 — model registry & safe promotion |
 | `docs/OBSERVABILITY_OPERATIONS_IMPLEMENTATION.md` | Post-MVP 05 — observability & operations |
 | `docs/TEMPORAL_MODEL_IMPLEMENTATION.md` | Post-MVP 06 — temporal LSTM model |
+| `docs/ENSEMBLE_CALIBRATION_IMPLEMENTATION.md` | Post-MVP 07 — ensemble & probability calibration |
+| `docs/MULTIMODAL_FINANCE_DATA_IMPLEMENTATION.md` | Post-MVP 08 — multimodal finance data (point-in-time) |
 | `docs/DECISIONS.md` | Architecture decision records |
 | `docs/CURRENT_STATE.md` | Current repository status |
