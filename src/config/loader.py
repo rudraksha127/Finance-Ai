@@ -413,6 +413,22 @@ class PipelineConfig:
 
 
 @dataclass(frozen=True)
+class TemporalConfig:
+    """``temporal`` section — temporal LSTM model (Post-MVP Milestone 06)."""
+
+    model_version: str = "temporal_lstm_v0.1"
+    sequence_length: int = 10
+    hidden_size: int = 32
+    num_layers: int = 1
+    dropout: float = 0.0
+    batch_size: int = 32
+    max_epochs: int = 100
+    patience: int = 10
+    learning_rate: float = 0.001
+    weight_decay: float = 0.0
+
+
+@dataclass(frozen=True)
 class RetrainingTriggerConfig:
     """Which autonomous retraining triggers are enabled (P03)."""
 
@@ -455,6 +471,7 @@ class AppConfig:
     api: ApiConfig = ApiConfig()
     pipeline: PipelineConfig = PipelineConfig()
     retraining: RetrainingConfig = RetrainingConfig()
+    temporal: TemporalConfig = TemporalConfig()
 
 
 # ---------------------------------------------------------------------------
@@ -606,6 +623,60 @@ def _build_pipeline(section: dict[str, Any]) -> PipelineConfig:
         min_quality_score=_num("min_quality_score", 70.0),
         max_gap_ratio=_num("max_gap_ratio", 0.05),
         instruments=tuple(str(item).upper() for item in instruments_raw),
+    )
+
+
+def _build_temporal(section: dict[str, Any]) -> TemporalConfig:
+    """Build the temporal-model config (P06)."""
+    def _num(key: str, default: float) -> float:
+        value = section.get(key, default)
+        if not isinstance(value, (int, float)) or isinstance(value, bool):
+            raise ConfigError(
+                f"invalid temporal.{key}: expected a number", context={"value": value}
+            )
+        return float(value)
+
+    sequence_length = int(_num("sequence_length", 10))
+    if sequence_length < 1:
+        raise ConfigError("config temporal.sequence_length must be >= 1")
+    hidden_size = int(_num("hidden_size", 32))
+    if hidden_size < 1:
+        raise ConfigError("config temporal.hidden_size must be >= 1")
+    num_layers = int(_num("num_layers", 1))
+    if num_layers < 1:
+        raise ConfigError("config temporal.num_layers must be >= 1")
+    dropout = _num("dropout", 0.0)
+    if not 0.0 <= dropout < 1.0:
+        raise ConfigError("config temporal.dropout must be within [0, 1)")
+    batch_size = int(_num("batch_size", 32))
+    if batch_size < 1:
+        raise ConfigError("config temporal.batch_size must be >= 1")
+    max_epochs = int(_num("max_epochs", 100))
+    if max_epochs < 1:
+        raise ConfigError("config temporal.max_epochs must be >= 1")
+    patience = int(_num("patience", 10))
+    if patience < 1:
+        raise ConfigError("config temporal.patience must be >= 1")
+    learning_rate = _num("learning_rate", 0.001)
+    if learning_rate <= 0:
+        raise ConfigError("config temporal.learning_rate must be > 0")
+    weight_decay = _num("weight_decay", 0.0)
+    if weight_decay < 0:
+        raise ConfigError("config temporal.weight_decay must be >= 0")
+    model_version = section.get("model_version") or "temporal_lstm_v0.1"
+    if not isinstance(model_version, str) or not model_version.strip():
+        raise ConfigError("config temporal.model_version must be a non-empty string")
+    return TemporalConfig(
+        model_version=model_version,
+        sequence_length=sequence_length,
+        hidden_size=hidden_size,
+        num_layers=num_layers,
+        dropout=dropout,
+        batch_size=batch_size,
+        max_epochs=max_epochs,
+        patience=patience,
+        learning_rate=learning_rate,
+        weight_decay=weight_decay,
     )
 
 
@@ -1245,6 +1316,11 @@ def load_config(
             "config section 'retraining' must be a mapping",
             context={"section": "retraining"},
         )
+    temporal_section = raw.get("temporal")
+    if temporal_section is not None and not isinstance(temporal_section, dict):
+        raise ConfigError(
+            "config section 'temporal' must be a mapping", context={"section": "temporal"}
+        )
 
     return AppConfig(
         environment=env,
@@ -1261,4 +1337,5 @@ def load_config(
         api=_build_api(api_section or {}),
         pipeline=_build_pipeline(pipeline_section or {}),
         retraining=_build_retraining(retraining_section or {}),
+        temporal=_build_temporal(temporal_section or {}),
     )

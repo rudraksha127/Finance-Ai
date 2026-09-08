@@ -246,7 +246,18 @@ class OperationsEngine:
         registry = ModelRegistry(self.config)
         try:
             active = registry.get_active_model()
-        except RegistryError as error:
+        except (RegistryError, OSError, ValueError) as error:
+            # Monitoring must not become a single point of failure: an
+            # unreadable registry (e.g. storage failure) degrades the
+            # component instead of crashing the snapshot.
+            return (
+                ComponentHealth(
+                    component="model_registry",
+                    status="UNKNOWN",
+                    detail=f"registry probe failed: {error}",
+                ),
+                {"status": "UNKNOWN", "active_model": None, "detail": str(error)},
+            )
             return (
                 ComponentHealth(component="model_registry", status="CRITICAL", detail=str(error)),
                 {"status": "CRITICAL", "active_model": None, "detail": str(error)},

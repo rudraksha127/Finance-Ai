@@ -14,6 +14,9 @@ scikit-learn>=1.3,<2.0    # ML models, preprocessing, metrics
 joblib>=1.3,<2.0          # Versioned serialization of approved sklearn artifacts
 lightgbm>=4.0,<5.0        # LightGBM gradient boosted decision trees
 xgboost>=2.0,<3.0         # XGBoost gradient boosted decision trees
+# PyTorch (CPU) — temporal LSTM model (TEMPORAL_MODEL_IMPLEMENTATION.md; P06).
+# CPU build avoids the CUDA runtime; import torch BEFORE sklearn on Windows.
+torch>=2.0                # Temporal LSTM sequences model (research-only, CPU)
 
 # --- Configuration ---
 pyyaml>=6.0,<7.0          # YAML config file parsing
