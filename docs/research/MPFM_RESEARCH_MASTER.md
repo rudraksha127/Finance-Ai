@@ -154,3 +154,26 @@ Historical data rights, real-source ingestion permissions, retention and redistr
 The conversation **Finance AI Research Planning** (project context timestamp 2026-11-16 14:47) is analyzed in [FINANCE_AI_CHAT_ANALYSIS.md](FINANCE_AI_CHAT_ANALYSIS.md). Its preserved direction is to research distinct trader/investor philosophies, formalize principles into model/algorithm research and investigate MPFM. It also records D0–D4 sequencing, parallel ontology/licensing/baseline work, the point-in-time prerequisite for multimodal learning, external data/legal dependencies and the unproven Candidate B / foundation-pretraining / compositional-generalization claims.
 
 The exact G01–G13 wording and full D0–D4 task-to-subsystem mapping remain to be recovered from the complete source transcript. Do not infer them from this summary.
+
+
+## 12. Phase 1 extension: financial world modeling
+
+The user supplied a detailed Phase 1 research note (sections 61–66) that sharpens MPFM's architecture from a foundation encoder into a three-part programme:
+
+1. State representation / encoder.
+2. Market-dynamics model that predicts distributions over future states.
+3. Independent decision, risk and execution evaluation.
+
+The distinction is material: a state encoder is not itself a world model. A market dynamics predictor without action conditioning is not yet an action-conditioned simulator. A more complete world-model claim requires valid action-conditioned rollouts or counterfactuals and a defensible way to validate them.
+
+The TFWM paper is a relevant state-representation benchmark, not proof that an MPFM financial world model already exists. It reports 15-minute cross-sectional Rank IC for return, volatility change and spread change, averaged over 32 evaluation months. The supervised multihead result improves return and volatility Rank IC relative to the individual supervised rows, while the spread result is slightly below the standalone spread specialist. The paper also reports substantial month-to-month performance variation. These results motivate task-selective shared learning and multi-regime evaluation; they are not Indian-market UP/DOWN accuracy or realized trading returns.
+
+**New architecture decisions proposed for research:**
+- Begin with a price-taker market-evolution model and a separate execution-cost/fill model.
+- Keep market-impact dynamics as a separate HFT branch that requires licensed depth/order-event data and credible counterfactual evaluation.
+- Test shared return/volatility learning with specialist spread/liquidity capacity.
+- Build a financially constrained augmentation registry rather than applying generic random time-series transformations.
+- Test hybrid reliability-gated multimodal fusion only when inputs are point-in-time and approved.
+- Keep base market forecasts philosophy-independent; evaluate mandate conditioning as an adapter, head or decision preference.
+
+Full analysis, source limitations, experiment matrices and references: [FINANCIAL_WORLD_MODELING_PHASE1.md](FINANCIAL_WORLD_MODELING_PHASE1.md).
