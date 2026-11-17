@@ -85,3 +85,37 @@ The exact workstream-to-D0–D4 mapping was not preserved in the available sourc
 - Added [FINANCE_AI_CHAT_ANALYSIS.md](FINANCE_AI_CHAT_ANALYSIS.md) with source boundary, visible prompts, preserved decisions, interpretation and missing-source checklist.
 - Reconciled the chat context with the existing MPFM master, prediction research ledger and development backlog.
 - Recover the original G01–G13 list and full D0–D4 task cards from the complete chat/source attachments before treating the research ledger as fully source-complete.
+
+
+## 2026-11-17 — MPFM Phase 1 financial world-modeling research consolidated
+
+### Source material and literature checked
+
+- Incorporated the user's research notes sections 61–66 covering financial world modeling, TFWM/Market-1T, financial augmentations, multimodal fusion and mandate-conditioned representation learning.
+- Verified the primary paper: Merchant et al., *Towards Financial World Modeling*, arXiv:2610.09048.
+- Checked the TFWM code/results README and Market-1T data-pipeline README.
+- Verified the September 2026 multimodal-finance survey, DOI 10.1016/j.inffus.2026.104249.
+
+### Evidence clarifications
+
+- TFWM's principal table is 15-minute cross-sectional Rank IC averaged across 32 evaluation months, not UP/DOWN accuracy or strategy returns.
+- Its multihead supervised representation recorded Rank IC 0.0311 (return), 0.0941 (volatility) and 0.2455 (spread); standalone spread specialist recorded 0.2517.
+- The paper reports month contributions of 97.2%, 98.9% and 99.9% of observed variation for return, volatility and spread tasks in its variance decomposition.
+- Market-1T is built from consolidated U.S. NBBO quote state and SIP trade reports at one-second resolution; its 11 fields do not constitute full L2/L3 depth or participant identity.
+- The TFWM README described a released sample (July 2019–December 2020, 230,025 ticker-days) and noted that complete open hosting was still being worked on at the time checked. Code MIT licensing must not be mistaken for data/weights permission.
+
+### MPFM research decisions proposed
+
+1. Separate state encoder, market-dynamics model and decision/execution evaluation.
+2. Begin with price-taker market evolution plus a separate execution model; HFT market impact requires a separate action-conditioned branch and licensed depth/event data.
+3. Test shared return/volatility representation with specialist spread/liquidity capacity.
+4. Build financially constrained augmentation contracts and regime-aware contrastive-learning experiments.
+5. Test hybrid reliability-gated multimodal fusion with availability-time controls.
+6. Treat mandate conditioning as structured conditioning, not voting trader-personality agents; keep the base market forecast philosophy-independent.
+
+### New research artifact
+
+- Added [FINANCIAL_WORLD_MODELING_PHASE1.md](FINANCIAL_WORLD_MODELING_PHASE1.md) with paper results, data access caveats, architecture, augmentation/fusion/mandate designs, risks and WM-01–WM-09 experiment proposals.
+- Linked it from the research index, MPFM master and prediction-model research ledger.
+
+No MPFM experiment was run as part of this documentation update.
