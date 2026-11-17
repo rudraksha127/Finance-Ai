@@ -499,3 +499,19 @@ ruff check src tests scripts
 | `docs/MULTIMODAL_FINANCE_DATA_IMPLEMENTATION.md` | Post-MVP 08 — multimodal finance data (point-in-time) |
 | `docs/DECISIONS.md` | Architecture decision records |
 | `docs/CURRENT_STATE.md` | Current repository status |
+
+
+---
+
+## MPFM Research Workspace
+
+The repository's living research records are maintained separately from implementation reports:
+
+- [Research hub](docs/research/README.md)
+- [MPFM research master](docs/research/MPFM_RESEARCH_MASTER.md)
+- [Prediction-model research ledger](docs/research/PREDICTION_MODEL_RESEARCH.md)
+- [Market data & broker integration research](docs/research/MARKET_DATA_AND_BROKER_INTEGRATION.md)
+- [Development backlog D0–D4](docs/research/DEVELOPMENT_BACKLOG.md)
+- [Dated research log](docs/research/RESEARCH_LOG.md)
+
+These documents distinguish implemented code, measured results, proposals and external dependencies. The primary objective is reliable out-of-sample market prediction; planned data sources and broker UI concepts are not represented as completed integrations.
