@@ -125,3 +125,26 @@ Only after prediction quality is reported separately, evaluate net return, bench
 4. Run target/threshold sensitivity on validation only (PRED-002).
 5. Expand to cross-instrument and regime-held-out evaluation.
 6. Only then test the MPFM pretraining and compositional-generalization hypotheses.
+
+
+## 10. Phase 1 extension — state learning, dynamics and task-selective sharing
+
+The new [Financial World Modeling Phase 1 analysis](FINANCIAL_WORLD_MODELING_PHASE1.md) adds a research programme inspired by *Towards Financial World Modeling* (arXiv:2610.09048).
+
+Important metric clarification: TFWM's headline table reports 15-minute-ahead cross-sectional **Rank IC** averaged over 32 evaluation months. These are not UP/DOWN classification accuracy figures and not realized trading returns. The supervised multihead row reports return 0.0311, volatility 0.0941 and spread 0.2455; the standalone spread specialist reports 0.2517. The result motivates shared return/volatility learning and specialist liquidity/spread capacity, subject to replication.
+
+### New proposed experiment IDs
+
+| ID | Question | Initial comparison | Status |
+|---|---|---|---|
+| WM-01 | What information does a financial state encoder preserve? | Tabular baselines, random encoder, supervised and SSL encoders | Proposed |
+| WM-02 | Which tasks should share parameters? | Independent specialists vs full multihead vs partial sharing | Proposed |
+| WM-03 | Which financial augmentations preserve economic meaning? | No augmentation vs TFWM-style views vs constrained registry | Proposed |
+| WM-04 | Can latent dynamics predict distributions of future states? | One-step and multi-horizon probabilistic transition models | Proposed |
+| WM-05 | Can price-taker execution be forecast separately from market evolution? | Fill/cost model conditioned on order, spread, volatility and liquidity | Proposed |
+| WM-06 | Can action-conditioned market impact be identified? | Depth/order-event model vs replay/simulation baselines | Blocked on licensed depth data and valid action records |
+| WM-07 | Do modalities add incremental predictive information? | F0–F7 fusion ablation with availability-time gating | Blocked on approved real historical modalities |
+| WM-08 | Does mandate conditioning improve its intended tasks? | No mandate, conditioned heads/adapters and specialists | Proposed |
+| WM-09 | Does the model generalize compositionally? | Held-out instrument × regime × mandate combinations | Unproven |
+
+All of these are research proposals. No result is claimed until a reproducible run is recorded with data version, universe, target, horizon, chronological splits and costs.
