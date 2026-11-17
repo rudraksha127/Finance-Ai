@@ -164,3 +164,16 @@ For the first real-market pilot, choose one primary licensed source and one inde
 ## 9. Source notes
 
 All provider URLs above are official documentation/product pages reviewed on 2026-11-17. Product capability, prices, limits and terms can change; re-check the linked source and save a dated snapshot before implementation or purchase.
+
+
+## 10. Market-1T and TFWM research reference (reviewed 2026-11-17)
+
+The MPFM Phase 1 work uses [Market-1T](https://github.com/fin-ai-lab/market-1t) and [Towards Financial World Modeling / TFWM](https://github.com/fin-ai-lab/tfwm) as research references.
+
+Market-1T is described by the paper as nearly one trillion one-second aggregates of U.S.-traded equities from 2008–2025, built from consolidated SIP quote/trade data and NBBO state. The 11 fields are best bid price/size, best ask price/size, OHLC, VWAP, traded volume and trade count. This is top-of-book plus trade aggregation; it is not full L2/L3 depth or participant-identity data.
+
+The TFWM README, when reviewed on 2026-11-17, described a sample from July 2019 to December 2020 (230,025 ticker-days) and stated that full open dataset hosting was being worked on with Massive. The Market-1T pipeline documents access to Massive flat files and S3 credentials/plan requirements. Verify current dataset-card, model-card and provider terms before attempting reproduction. The code repository's MIT license does not by itself establish the data or pretrained-weight license.
+
+Market-1T is a U.S.-equity reference, not a ready-made NSE/BSE feed. An Indian reproduction requires locally valid exchange calendars, instrument identity, session rules, tick sizes, corporate actions, timestamps, permitted data rights and (for HFT) the actual order-depth/event fields supplied by the licensed source.
+
+Detailed architecture and experiment implications are documented in [FINANCIAL_WORLD_MODELING_PHASE1.md](FINANCIAL_WORLD_MODELING_PHASE1.md).
