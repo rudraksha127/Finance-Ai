@@ -147,3 +147,10 @@ Historical data rights, real-source ingestion permissions, retention and redistr
 - ../MULTIMODAL_FINANCE_DATA_IMPLEMENTATION.md
 - [Market data and broker source review](MARKET_DATA_AND_BROKER_INTEGRATION.md)
 - [Prediction-model experiment ledger](PREDICTION_MODEL_RESEARCH.md)
+
+
+## 11. Project chat source
+
+The conversation **Finance AI Research Planning** (project context timestamp 2026-11-16 14:47) is analyzed in [FINANCE_AI_CHAT_ANALYSIS.md](FINANCE_AI_CHAT_ANALYSIS.md). Its preserved direction is to research distinct trader/investor philosophies, formalize principles into model/algorithm research and investigate MPFM. It also records D0–D4 sequencing, parallel ontology/licensing/baseline work, the point-in-time prerequisite for multimodal learning, external data/legal dependencies and the unproven Candidate B / foundation-pretraining / compositional-generalization claims.
+
+The exact G01–G13 wording and full D0–D4 task-to-subsystem mapping remain to be recovered from the complete source transcript. Do not infer them from this summary.
