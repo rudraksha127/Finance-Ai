@@ -193,3 +193,17 @@ Key conclusions:
 - HftBacktest and NautilusTrader both document limits around replaying an immutable historical market; simulated fill assumptions and market-impact boundaries must be explicit.
 - NSE market-data levels, multicast/leased-line delivery and usage policy make licensed non-display depth data a separate gating dependency.
 - D0 → D1 → D2 → D3 → D4 remains unchanged. No undocumented D-code mapping has been inferred.
+
+
+## 14. Execution-engine and HFT replay compatibility audit
+
+The component-level compatibility and experiment plan is documented in [NautilusTrader Compatibility & HftBacktest POC](NAUTILUS_COMPATIBILITY_AND_HFTBACKTEST_POC.md).
+
+The key decisions are:
+
+- Preserve Finance AI as the authority for canonical instrument identity, point-in-time data, forecast lineage, model/experiment registry and predictive research.
+- Evaluate NautilusTrader only as an isolated, optional event-driven execution subsystem; custom Python adapters are documented, but Indian exchange/broker adapters are not in the official adapter list reviewed.
+- Evaluate HftBacktest only after a permitted event dataset carries valid exchange and local receive timestamps and suitable depth/order semantics.
+- Do not map the current daily OHLCV data source or BUY/SELL output directly to a live execution command.
+- Preserve the current close-to-close research backtest as a separately versioned baseline.
+- Keep D0 → D1 → D2 → D3 → D4 unchanged.
