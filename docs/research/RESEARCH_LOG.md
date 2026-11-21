@@ -390,3 +390,54 @@ All six are research hypotheses; none is claimed to be novel, implemented or bet
 ### Immediate decision
 
 Start with MBR-00 and MBR-01: re-establish the existing Finance AI baseline, add zero-return/random-walk and strong classical comparators, compute the full metric suite and expand the untouched out-of-sample protocol. Do not begin advanced MPFM model experiments until data, target, benchmark and baseline contracts are stable. Preserve D0 → D1 → D2 → D3 → D4 and existing data-rights dependencies.
+
+
+## 2026-11-21 — Modular production-oriented system architecture and engineering disciplines
+
+### User's architecture requirement clarified
+
+- All research, open-source findings and model benchmarks must inform the actual Finance AI / MPFM system design, not remain isolated papers or experiments.
+- The system must be modular and deliberately apply DSA, OOP/OOPM, OOAD, Computer Networks, Operating Systems, DBMS, distributed systems, system design, security, testing and reliability engineering.
+- The real-world objective is correct operation under data/network/worker/model failures, predictable performance, maintainability and safe evolution—not only high predictive scores.
+
+### Existing repository architecture audited
+
+- Reopened SYSTEM_ARCHITECTURE.md, ARCHITECTURE_PRINCIPLES.md, ENGINEERING_CONSTITUTION.md, DATA_ARCHITECTURE.md, DECISIONS.md and CURRENT_STATE.md.
+- Existing standards already specify Python-first design, typed public interfaces, loose coupling, high cohesion, no circular dependencies, pure/deterministic transformations where possible, chronological data splits, data lineage, structured logging, tests, PR review and architecture decision records.
+- Existing accepted ADRs include Python as the primary MVP language (ADR-0002), file-backed CSV/Parquet MVP storage (ADR-0005), no cloud/external dependencies for the MVP (ADR-0007), chronological data splitting (ADR-0004), and structured logging (ADR-0006).
+- Existing SYSTEM_ARCHITECTURE.md describes the original MVP and ARCHITECTURE_PRINCIPLES.md describes the original layers. They are not a complete target architecture for expanded live multi-market and autonomous-agent scope.
+- The new target-state blueprint preserves existing ADRs; a new database, cloud service, Rust/C++ path or broker integration requires measured justification and a new/superseding ADR.
+
+### External engineering research used
+
+- AWS Well-Architected Framework six pillars: operational excellence, security, reliability, performance efficiency, cost optimisation and sustainability.
+- C4 model: context, container, component and code-level architecture views.
+- Microsoft bounded-context and event-driven architecture guidance.
+- AWS transactional outbox, retry/backoff and circuit-breaker patterns.
+- Google SRE service-level objectives and four golden monitoring signals (latency, traffic, errors, saturation).
+- Python concurrency documentation distinguishing I/O-bound asyncio, threads, processes and free-threaded runtime considerations.
+- OpenTelemetry semantic conventions for consistent traces/metrics/logs.
+- NIST SSDF SP 800-218 and OWASP application/agent security guidance.
+
+### Architecture decisions proposed
+
+1. Start with a modular monolith, explicit bounded contexts and ports/adapters; extract services only when a measured performance, isolation, scaling or operational requirement justifies it.
+2. Separate product/control, real-time market-data/decision, research/model, autonomous-agent and platform-engineering planes.
+3. Define module ownership for source entitlement, security master, market data, market state, corporate actions, PIT data, features, datasets, model research/registry, inference, decision/risk, backtesting, future execution, agent orchestration and application API.
+4. Use OOP/OOPM/OOAD to encode invariants through entities, value objects, immutable events, application services, ports/adapters and explicit state machines; use SOLID/design patterns when they reduce actual coupling.
+5. Apply DSA based on event workloads: hash maps, ring buffers, incremental rolling statistics, monotonic deques, heaps, ordered price levels and bounded queues. Use property/performance tests and profile before low-level optimisation.
+6. Apply OS/CN principles: isolate CPU/GPU work, keep blocking calls off the market event loop, use bounded backpressure, separate exchange/receive/availability timestamps, detect sequence gaps, recover subscriptions and handle retries/idempotency/circuit breakers.
+7. Apply DBMS/distributed-systems principles: raw append-only data, transactional metadata where required, unique constraints, idempotent consumers, outbox for database/event dual writes, explicit consistency and reconciliation.
+8. Keep training, inference, decision/risk and future execution separate; LLM agents must not be on the market tick hot path.
+9. Define SLIs/SLOs, failure injection, replay, contract/property/integration/soak/security/performance tests, observability, backups and recovery procedures before production claims.
+10. Maintain D0 → D1 → D2 → D3 → D4 unchanged; the architecture is a cross-cutting quality contract, not a replacement backlog.
+
+### New research artifact
+
+- Added [MPFM_MODULAR_SYSTEM_ARCHITECTURE_AND_ENGINEERING_BLUEPRINT.md](MPFM_MODULAR_SYSTEM_ARCHITECTURE_AND_ENGINEERING_BLUEPRINT.md).
+- Updated the research index, MPFM Research Master and Development Backlog with the blueprint and its engineering acceptance rules.
+- The blueprint covers planes, bounded contexts, module contracts, OOAD/OOP/DSA/CN/OS/DBMS mapping, reliability, telemetry, security, testing, data architecture, proposed folder structure and D0–D4 migration gates.
+
+### Implementation status
+
+This is a proposed target architecture and research update only. No code module, database, cloud dependency, message broker, broker adapter, Rust/C++ hot path or production deployment was added by this update. Existing MVP ADRs remain in force until an explicit ADR change is accepted.
