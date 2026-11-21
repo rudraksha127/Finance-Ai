@@ -328,3 +328,65 @@ No MPFM experiment was run as part of this documentation update.
 ### Current decision
 
 Build one durable, observable, restartable, budgeted and secure research workflow before creating a large agent swarm. The initial goal is proven task completion and evidence traceability, not maximum agent count or nonstop LLM activity. No agent runtime, new dependency, live feed, live execution path or production deployment is marked implemented.
+
+
+## 2026-11-21 — Backend-first model research and benchmark programme
+
+### User's clarified priority
+
+- The primary technical focus for the autonomous research organisation is backend models, algorithm design, quantitative experiments, accuracy/precision/recall/F1 and the wider benchmark suite.
+- Agents should read recent and relevant financial ML papers, reproduce their baselines, extract limitations, design better hypotheses, implement them and independently validate every result.
+- The goal is a top-quality, evidence-backed backend—not more agents, more documentation or larger models for their own sake.
+
+### Primary papers reviewed in this research pass
+
+- FinVerse: Financial Time-Series Benchmark (arXiv:2608.03259, 4 August 2026): 116,897 financial series / 171.1M observations in the data artifact; evaluated subset 60,232 series / 17.4M observations; 43 public TSFMs; 11 metric families and 78 metrics. Its results separate point-wise, cross-sectional ranking and portfolio performance; different metrics favour different models.
+- Pretrained Time-Series Foundation Models for Financial Return Forecasting (arXiv:2606.27100, 25 June 2026): compares TimesFM-2.5, Moirai-2.0, Chronos and others against neural models on five US equities. Pretrained models lead 8/10 task-level rankings, but gains over zero-return/random-walk are small and statistically significant superiority is reported only in two comparisons under the paper's one-sided Diebold–Mariano test. Asset-specific iTransformer wins demonstrate no universal pretrained-model advantage.
+- Towards Financial World Modeling / TFWM (arXiv:2610.09048, 6 October 2026): Market-1T and 18 representation strategies. The supervised multihead model reports Rank IC 0.0311 return, 0.0941 volatility and 0.2455 spread; separate specialist spread model reports 0.2517. Shared representation helped return/volatility in the stated experiment but showed task spillover for spread.
+- TensorLOB (arXiv:2611.02866, 2 November 2026): structure-preserving tensor architecture for LOB data. On FI-2010, reports weighted F1 of 82.5 / 72.2 / 77.4 / 79.1 at 10 / 20 / 50 / 100 event horizons. The paper uses ten trading days and three seeds; some baselines collapse to majority stationary class. Treat this as a promising preprint result requiring independent replication, not an Indian-market result.
+- TailDART (arXiv:2611.09176, 6 November 2026): compact 2.68M-parameter TSFM using grouped-query attention and a Johnson SU distribution head. Reports up to 48.1% inference-latency reduction vs Lag-Llama and a 0.668 ms daily forecast step in its setup. This is model-only latency on its benchmark, not feed-to-decision latency; pretraining/data-overlap and domain-transfer limits must be checked.
+- LiT: Limit Order Book Transformer (Frontiers in AI, 2025): Binance L2 top-20 book data, roughly one million LOB snapshots, structured temporal patches and transformer+LSTM. At 300 ms–1,000 ms horizon it reports precision 66.20, recall 68.34, F1 66.40 and accuracy 68.34. The paper also shows zero-shot deterioration under month-to-month distribution shift and improvement from fine-tuning; crypto results do not establish NSE transfer.
+- Evaluation Integrity in ML for Finance (SSRN working paper, 20 July 2026): review/checklist covering leakage, PBO, Deflated Sharpe, purged/combinatorial cross-validation and multiple-testing issues.
+- FinCast (ACM CIKM 2025): added as prior art for financial time-series foundation modelling; no numerical result was adopted without a fully inspected table and reproduction conditions.
+
+### New research conclusions
+
+1. Accuracy/F1 alone is not an adequate benchmark for a finance system. Use point-wise, cross-sectional ranking, portfolio, probabilistic, calibration, statistical and runtime views.
+2. Pretrained time-series foundation models are candidates/priors, not assumed alpha engines; random-walk and strong local models remain mandatory comparators.
+3. Multi-task representation can benefit related targets but specialised capacity may be needed for spread/liquidity.
+4. Order-book modelling should preserve time, side, level and attribute structure where valid depth/event data exist; do not fabricate L2/L3 data from OHLCV.
+5. Compact model efficiency matters, but reported inference latency must be separated from data decode, feature calculation, queueing, risk and end-to-end feed-to-decision latency.
+6. Calibration, selective prediction and explicit NO TRADE behaviour are first-class capabilities.
+7. The documented Finance AI LR/RF ensemble regressed; do not assume simple averaging or majority voting will work.
+8. All candidate improvements require multi-instrument/regime evaluation, untouched test data, statistical uncertainty and cost-aware portfolio tests.
+
+### Proposed MPFM algorithm hypotheses
+
+- RC-MTFSM: regime-conditioned multi-task financial state model, sharing useful return/volatility structure while retaining specialist liquidity/spread heads.
+- SPT-LOB: structure-preserving tensor order-book model with low-rank interactions and a compact temporal block.
+- RGEE: reliability- and regime-gated expert ensemble using chronological out-of-fold predictions.
+- CSFA: calibrated selective forecasting and abstention when uncertainty/data quality/costs dominate.
+- DHT-FH: heavy-tail probabilistic forecast head using quantile/Student-t/Johnson SU candidates.
+- DSA: drift-aware safe adaptation with candidate evaluation and rollback.
+
+All six are research hypotheses; none is claimed to be novel, implemented or better until prior-art and controlled experiments are completed.
+
+### Benchmark programme established
+
+- Classification: confusion matrix, accuracy, balanced accuracy, per-class precision/recall/F1, macro-F1, weighted-F1, MCC, ROC-AUC and PR-AUC where applicable.
+- Regression/direction: MAE, RMSE, MASE, relative MAE, directional hit ratio, Rank IC/ICIR.
+- Probabilistic: log loss/NLL, Brier, ECE, reliability diagrams, pinball loss, CRPS and interval coverage.
+- Volatility/risk: QLIKE, volatility error, VaR coverage and tail diagnostics.
+- Portfolio: net returns, Sharpe, Sortino, Calmar, maximum drawdown, turnover, exposure, slippage, fees, capacity and fill metrics.
+- Statistical validation: Diebold–Mariano where appropriate, block bootstrap, multiple-testing correction, Deflated Sharpe and PBO/CPCV when the design supports them.
+- Runtime: model-only and end-to-end P50/P95/P99/P99.9 latency, throughput, cold start, memory and hardware details.
+
+### New research artifact
+
+- Added [MPFM_MODEL_RESEARCH_AND_BENCHMARK_ROADMAP.md](MPFM_MODEL_RESEARCH_AND_BENCHMARK_ROADMAP.md).
+- Updated the research index and MPFM Research Master.
+- The roadmap defines six model research hypotheses, six model benchmark tracks, 12 model/benchmark agent roles and MBR-00 to MBR-09 experiments.
+
+### Immediate decision
+
+Start with MBR-00 and MBR-01: re-establish the existing Finance AI baseline, add zero-return/random-walk and strong classical comparators, compute the full metric suite and expand the untouched out-of-sample protocol. Do not begin advanced MPFM model experiments until data, target, benchmark and baseline contracts are stable. Preserve D0 → D1 → D2 → D3 → D4 and existing data-rights dependencies.
