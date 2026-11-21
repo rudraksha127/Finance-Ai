@@ -17,6 +17,8 @@ This folder is the living research layer for the Finance AI project. It records 
 | [HFT Systems and Open-Source Ecosystem Research](HFT_SYSTEMS_AND_OPEN_SOURCE_ECOSYSTEM_RESEARCH.md) | Public HFT firm operating models, source-level open-source reviews, event-driven architecture, market-microstructure data requirements, tool strategy and staged integration recommendations |
 | [Personal Multi-Market Trading System Design](FINANCE_AI_TRADING_SYSTEM_DESIGN.md) | Clarified personal trading-intelligence vision, HFT-vs-retail-algo boundary, multi-model signal engine, risk/execution, adapters and roadmap |
 | [Autonomous Multi-Agent Execution Blueprint](MPFM_AUTONOMOUS_MULTI_AGENT_EXECUTION_BLUEPRINT.md) | Deep research and execution plan for durable 24/7 agent orchestration, specialist roles, Temporal + Agent Framework, task contracts, memory/evidence, security, sandboxing, budgets, acceptance tests and phased rollout |
+| [Model Research & Benchmark Roadmap](MPFM_MODEL_RESEARCH_AND_BENCHMARK_ROADMAP.md) | Backend-first model research, latest financial ML papers, classification/regression/probabilistic/portfolio/runtime metrics, baseline suite, new MPFM algorithm hypotheses and reproducible experiment programme |
+
 | [Development Backlog](DEVELOPMENT_BACKLOG.md) | D0 → D1 → D2 → D3 → D4 order, workstreams and dependencies |
 | [Research Log](RESEARCH_LOG.md) | Dated record of discoveries, decisions, experiments and next actions |
 | [Finance AI Project Chat Analysis](FINANCE_AI_CHAT_ANALYSIS.md) | Analysis of the Finance AI Research Planning conversation and its preserved decisions |
@@ -63,6 +65,6 @@ Use these labels consistently:
 
 ## Current research snapshot
 
-As of 2026-11-17, the repository records a completed research-grade single-instrument MVP and post-MVP infrastructure/model experiments. The documented AAPL experiments are weak and do **not** establish a reliable profitable prediction model. MPFM's foundation-model advantage, Candidate B novelty and compositional generalization on real markets remain unproven. Real historical data rights and approval of point-in-time fundamental/news sources remain gating dependencies.
+As of 2026-11-21, the repository records a completed research-grade single-instrument MVP and post-MVP infrastructure/model experiments. New research documents now specify the autonomous multi-agent execution plan and backend model/benchmark programme. The documented AAPL experiments are weak and do **not** establish a reliable profitable prediction model. MPFM's foundation-model advantage, Candidate B novelty and compositional generalization on real markets remain unproven. Real historical data rights and approval of point-in-time fundamental/news sources remain gating dependencies.
 
-The repository's engineering implementation records were last updated in September 2026. This research snapshot does not imply that the full test suite or every integration has been re-executed on 2026-11-17.
+The repository's engineering implementation records were last updated in September 2026. This research snapshot does not imply that the full test suite or every integration has been re-executed on 2026-11-21.
