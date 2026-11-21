@@ -552,3 +552,10 @@ A separate source-level research artifact now documents how public HFT firms des
 - [HFT Systems and Open-Source Ecosystem Research](HFT_SYSTEMS_AND_OPEN_SOURCE_ECOSYSTEM_RESEARCH.md)
 
 The key boundary is unchanged: Finance AI's primary objective is predictive multi-market intelligence. HFT microstructure and execution are separate tracks gated by licensed depth/tick data, venue permissions, a defensible economic hypothesis and operational feasibility. This supplement does not claim a production HFT implementation.
+
+
+## 17. Component-level engine compatibility follow-up
+
+The detailed interface audit and POC plan is recorded in [NAUTILUS_COMPATIBILITY_AND_HFTBACKTEST_POC.md](NAUTILUS_COMPATIBILITY_AND_HFTBACKTEST_POC.md).
+
+It maps the current Finance AI historical source, instrument registry, signal, API and close-to-close simulator contracts against NautilusTrader's custom data/execution adapter model, and specifies the event-data and timestamp requirements for HftBacktest. No new engine or broker integration is claimed as implemented.
