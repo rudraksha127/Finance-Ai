@@ -16,6 +16,7 @@ This folder is the living research layer for the Finance AI project. It records 
 | [NautilusTrader Compatibility & HftBacktest POC](NAUTILUS_COMPATIBILITY_AND_HFTBACKTEST_POC.md) | Exact Finance AI interface mapping, custom adapter feasibility, event schema and HFT data requirements, POC experiments and go/no-go gates |
 | [HFT Systems and Open-Source Ecosystem Research](HFT_SYSTEMS_AND_OPEN_SOURCE_ECOSYSTEM_RESEARCH.md) | Public HFT firm operating models, source-level open-source reviews, event-driven architecture, market-microstructure data requirements, tool strategy and staged integration recommendations |
 | [Personal Multi-Market Trading System Design](FINANCE_AI_TRADING_SYSTEM_DESIGN.md) | Clarified personal trading-intelligence vision, HFT-vs-retail-algo boundary, multi-model signal engine, risk/execution, adapters and roadmap |
+| [Autonomous Multi-Agent Execution Blueprint](MPFM_AUTONOMOUS_MULTI_AGENT_EXECUTION_BLUEPRINT.md) | Deep research and execution plan for durable 24/7 agent orchestration, specialist roles, Temporal + Agent Framework, task contracts, memory/evidence, security, sandboxing, budgets, acceptance tests and phased rollout |
 | [Development Backlog](DEVELOPMENT_BACKLOG.md) | D0 → D1 → D2 → D3 → D4 order, workstreams and dependencies |
 | [Research Log](RESEARCH_LOG.md) | Dated record of discoveries, decisions, experiments and next actions |
 | [Finance AI Project Chat Analysis](FINANCE_AI_CHAT_ANALYSIS.md) | Analysis of the Finance AI Research Planning conversation and its preserved decisions |
