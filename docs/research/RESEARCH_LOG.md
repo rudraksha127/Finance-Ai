@@ -119,3 +119,40 @@ The exact workstream-to-D0–D4 mapping was not preserved in the available sourc
 - Linked it from the research index, MPFM master and prediction-model research ledger.
 
 No MPFM experiment was run as part of this documentation update.
+
+
+## 2026-11-21 — Personal multi-market trading-intelligence vision clarified
+
+### User's clarified product intent
+
+- Finance AI is intended as a personal system for research and testing first.
+- It should monitor Indian and relevant global markets, including NSE, BSE and MCX, and combine technical analysis, fundamentals, news/announcements, derivatives information, liquidity and aggregated crowd/positioning evidence.
+- Its key user-facing outcome is a disciplined trade candidate: possible entry conditions, invalidation/stop, exit conditions, risk/size constraints and an explicit no-trade result when evidence is weak.
+- Multiple specialist models/strategies may run in the background, but their outputs must be calibrated, regime-aware and evaluated after realistic costs. An unstructured majority vote is not acceptable.
+- The user's HFT reference is recorded, but true HFT is separated from retail/API algorithmic trading and AI-assisted decision support. Retail broker APIs and browser dashboards must not be represented as exchange-colocated HFT infrastructure.
+- Crowd behaviour must be described using observable aggregate proxies (e.g. order-flow imbalance, depth, OI changes, volume profile, breadth and public participant reports), not as access to the identities or exact actions of every market participant.
+
+### System-design document added
+
+- Added [FINANCE_AI_TRADING_SYSTEM_DESIGN.md](FINANCE_AI_TRADING_SYSTEM_DESIGN.md).
+- It specifies data access/governance, canonical market events, specialist model families, strategy/signal contracts, risk and execution controls, broker capability adapters, paper/shadow/manual/live modes, an isolated HFT feasibility lane, validation methodology and an implementation roadmap.
+- This is a proposed architecture. It does not claim that any new source, model, broker integration, strategy, order execution or HFT infrastructure has been implemented or validated.
+
+### Official source review (2026-11-21)
+
+- SEBI's retail-algo circular is dated 2025-02-04; SEBI's 2025-09-30 implementation extension states the framework applies to all stock brokers from 2026-04-01.
+- NSE's 2025-05-05 implementation standards include static-IP/API-key and operational controls; exact client/category requirements must be confirmed with the broker and current exchange rules.
+- Upstox's current documentation lists NSE/BSE/MCX instruments and publishes retail order API rate limits (10 req/s for regular algos; 50 req/s for SEBI-registered algos, with additional period limits).
+- Groww's current Trading API documentation states that API trading is supported for cash and F&O, while commodity/MCX API trading is not currently supported.
+- NSE and MCX publish separate exchange market-data feed products and usage conditions. NSE's non-display policy explicitly covers use of market data in algorithmic trading calculations; broker API access is not assumed to confer exchange-wide data rights.
+- TradingView's charting library does not supply market data; an integrator must connect an entitled data source.
+- Open-source candidates recorded for due diligence: NautilusTrader, QuantConnect LEAN, FinRL/FinRL-X, FinGPT/FinNLP and TimesFM. Their suitability and licenses must be checked individually; for example, TimesFM 3.0 default weights are identified by the repository as non-commercial/non-production.
+- Order-flow research includes published work on deep order-flow imbalance using granular Nasdaq limit-order-book data. Transfer to NSE/MCX is an open empirical question.
+
+### Decisions / guardrails
+
+1. Begin with research, backtesting, replay, paper/shadow and manual-approval workflows. Do not enable live orders merely because a model emits a signal.
+2. Treat HFT as a separate feasibility track requiring tick/order-book rights, specialized connectivity/latency infrastructure, venue approvals and a demonstrated cost-adjusted edge.
+3. Use exchange-agnostic internal schemas and capability-aware broker adapters; verify segment, depth, rate-limit, account and data rights per provider.
+4. Separate forecast quality, strategy decision quality, execution quality, net economic performance and operational reliability.
+5. Retain the existing repository's implemented status as documented; this new design does not turn the research-only FastAPI MVP into a live trading system.
