@@ -413,6 +413,7 @@ These are candidates for code/research review, not automatic dependencies. Audit
 | [NautilusTrader](https://github.com/nautechsystems/nautilus_trader) | Rust-native, event-driven multi-asset/multi-venue execution, deterministic simulation, order book and adapters | Strong candidate to study for the event-driven execution/replay architecture; exchange-specific Indian adapter and entitlement work remains |
 | [QuantConnect LEAN](https://github.com/QuantConnect/Lean) | Modular event-driven backtesting/live engine, portfolio and brokerage abstractions | Strong reference for strategy lifecycle and reproducible backtest/live parity; inspect actual broker and data support/licensing |
 | [FinRL](https://github.com/AI4Finance-Foundation/FinRL) / [FinRL-X](https://github.com/AI4Finance-Foundation/FinRL-Trading) | Financial RL environments, rewards, agents and modular trading research | Research framework, not proof of a profitable trading policy; avoid RL before a strong cost-aware baseline |
+| [FinRobot](https://github.com/AI4Finance-Foundation/FinRobot) | LLM-based financial agents and research workflows | Study information retrieval, tool orchestration and analyst workflows; an agent demo is not evidence of executable trading alpha |
 | [FinGPT](https://github.com/AI4Finance-Foundation/FinGPT) | Financial text modeling, data curation, sentiment and event extraction | NLP research component; text sentiment is not a standalone trade signal |
 | [TimesFM](https://github.com/google-research/timesfm) | Pretrained time-series forecasting, covariates and fine-tuning | Check the exact checkpoint license: the repository currently identifies TimesFM 3.0 weights as non-commercial/non-production by default |
 | [FinNLP](https://github.com/AI4Finance-Foundation/FinNLP) | Financial data collection and NLP datasets | Review every upstream data source's terms before reuse |
@@ -500,7 +501,7 @@ Official sources:
 3. NSE — [Retail algo implementation standards, 2025-05-05](https://nsearchives.nseindia.com/content/circulars/INVG67858.pdf)
 4. NSE — [Algorithmic trading / Decision Support Tools](https://www.nseindia.com/static/trade/platform-services-non-neat-decision-support-tools-algorithm-trading)
 5. NSE — [Non-Display Usage of Market Data policy](https://nsearchives.nseindia.com/web/sites/default/files/inline-files/Non_Display_Policy.pdf)
-6. NSE — [Real-time data subscription](https://www.nseindia.com/market-data/real-time-data-subscription)
+6. NSE — [Real-time data subscription](https://www.nse.in/static/market-data/real-time-data-subscription)
 7. MCX — [Data feed policy and subscriptions](https://www.mcxindia.com/technology/datafeed)
 8. MCX — [Technology and services FAQ](https://www.mcxindia.com/faq/technology-services)
 9. Upstox — [Market data feed V3](https://upstox.com/developer/api-documentation/v3/get-market-data-feed/)
