@@ -543,3 +543,12 @@ Official sources:
 | Reliable net profitability | Unproven |
 
 **Bottom line:** Finance AI should first become a data-correct, cost-aware, researchable and auditable trading-intelligence platform. Broker automation is a later controlled capability. True HFT remains a separate feasibility track—not a label for ordinary retail API trading.
+
+
+## 16. HFT systems and open-source engineering study
+
+A separate source-level research artifact now documents how public HFT firms describe their operating models, which open-source codebases were inspected, what the current Finance-Ai repository does not yet provide, and how a staged HFT/microstructure research lane could be evaluated:
+
+- [HFT Systems and Open-Source Ecosystem Research](HFT_SYSTEMS_AND_OPEN_SOURCE_ECOSYSTEM_RESEARCH.md)
+
+The key boundary is unchanged: Finance AI's primary objective is predictive multi-market intelligence. HFT microstructure and execution are separate tracks gated by licensed depth/tick data, venue permissions, a defensible economic hypothesis and operational feasibility. This supplement does not claim a production HFT implementation.
