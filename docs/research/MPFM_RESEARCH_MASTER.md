@@ -177,3 +177,19 @@ The TFWM paper is a relevant state-representation benchmark, not proof that an M
 - Keep base market forecasts philosophy-independent; evaluate mandate conditioning as an adapter, head or decision preference.
 
 Full analysis, source limitations, experiment matrices and references: [FINANCIAL_WORLD_MODELING_PHASE1.md](FINANCIAL_WORLD_MODELING_PHASE1.md).
+
+
+## 13. HFT systems and open-source execution research
+
+The public-source study is recorded in [HFT Systems and Open-Source Ecosystem Research](HFT_SYSTEMS_AND_OPEN_SOURCE_ECOSYSTEM_RESEARCH.md).
+
+Key conclusions:
+
+- Public HFT firm material repeatedly emphasizes integrated data, pricing/alpha, risk, execution, infrastructure, operations and research feedback—not a single predictive model.
+- Finance AI remains prediction-first. HFT microstructure and execution are separate lanes.
+- NautilusTrader is the leading event-driven execution architecture candidate to evaluate; HftBacktest is the specialist L2/L3 replay, latency and queue-model candidate; ABIDES is the agent-based simulation reference.
+- LEAN, Hummingbot, FinRL-X and Qlib provide narrower references for event-driven trading, connector/order lifecycle, portfolio composition and quant research workflows.
+- These are research candidates, not adopted dependencies or evidence of Indian venue integration.
+- HftBacktest and NautilusTrader both document limits around replaying an immutable historical market; simulated fill assumptions and market-impact boundaries must be explicit.
+- NSE market-data levels, multicast/leased-line delivery and usage policy make licensed non-display depth data a separate gating dependency.
+- D0 → D1 → D2 → D3 → D4 remains unchanged. No undocumented D-code mapping has been inferred.
