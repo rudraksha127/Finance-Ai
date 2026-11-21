@@ -19,6 +19,7 @@ This folder is the living research layer for the Finance AI project. It records 
 | [Autonomous Multi-Agent Execution Blueprint](MPFM_AUTONOMOUS_MULTI_AGENT_EXECUTION_BLUEPRINT.md) | Deep research and execution plan for durable 24/7 agent orchestration, specialist roles, Temporal + Agent Framework, task contracts, memory/evidence, security, sandboxing, budgets, acceptance tests and phased rollout |
 | [Model Research & Benchmark Roadmap](MPFM_MODEL_RESEARCH_AND_BENCHMARK_ROADMAP.md) | Backend-first model research, latest financial ML papers, classification/regression/probabilistic/portfolio/runtime metrics, baseline suite, new MPFM algorithm hypotheses and reproducible experiment programme |
 
+| [Modular System Architecture & Engineering Blueprint](MPFM_MODULAR_SYSTEM_ARCHITECTURE_AND_ENGINEERING_BLUEPRINT.md) | Target modular architecture applying DSA, OOP/OOPM, OOAD, CN, OS, DBMS, distributed systems, reliability, security, testing and performance engineering while preserving the existing MVP and D0–D4 sequence |
 | [Development Backlog](DEVELOPMENT_BACKLOG.md) | D0 → D1 → D2 → D3 → D4 order, workstreams and dependencies |
 | [Research Log](RESEARCH_LOG.md) | Dated record of discoveries, decisions, experiments and next actions |
 | [Finance AI Project Chat Analysis](FINANCE_AI_CHAT_ANALYSIS.md) | Analysis of the Finance AI Research Planning conversation and its preserved decisions |
