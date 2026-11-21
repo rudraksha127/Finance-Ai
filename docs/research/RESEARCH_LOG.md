@@ -217,13 +217,13 @@ No MPFM experiment was run as part of this documentation update.
 
 ### Exact Finance AI interface files reopened
 
-- \`src/data/sources/base.py\` and \`src/data/sources/yahoo.py\`: historical-only provider contract; intervals documented as 1d/1wk/1mo and records are OHLCV-style.
-- \`src/data/instruments.py\`: current ticker identity record is minimal (ticker, active flag, optional exchange and first_seen).
-- \`src/backtest/signals.py\`: deterministic BUY / SELL / NO_TRADE from UP/DOWN probabilities.
-- \`src/api/schemas.py\` and \`src/api/orchestrator.py\`: inference API interval is 1d only; current API mode live is refused.
-- \`src/api/decision.py\`: one-unit placeholder position size for a non-NO_TRADE signal.
-- \`src/backtest/execution.py\`: long-only fixed quantity, close-to-close, single position and fixed bps costs.
-- \`docs/DECISIONS.md\`, \`docs/ENGINEERING_CONSTITUTION.md\`, \`docs/CURRENT_STATE.md\`: Python-first MVP, file-backed storage, dependency constraints, prediction/decision/execution separation and current research-only state.
+- `src/data/sources/base.py` and `src/data/sources/yahoo.py`: historical-only provider contract; intervals documented as 1d/1wk/1mo and records are OHLCV-style.
+- `src/data/instruments.py`: current ticker identity record is minimal (ticker, active flag, optional exchange and first_seen).
+- `src/backtest/signals.py`: deterministic BUY / SELL / NO_TRADE from UP/DOWN probabilities.
+- `src/api/schemas.py` and `src/api/orchestrator.py`: inference API interval is 1d only; current API mode live is refused.
+- `src/api/decision.py`: one-unit placeholder position size for a non-NO_TRADE signal.
+- `src/backtest/execution.py`: long-only fixed quantity, close-to-close, single position and fixed bps costs.
+- `docs/DECISIONS.md`, `docs/ENGINEERING_CONSTITUTION.md`, `docs/CURRENT_STATE.md`: Python-first MVP, file-backed storage, dependency constraints, prediction/decision/execution separation and current research-only state.
 
 ### NautilusTrader compatibility finding
 
