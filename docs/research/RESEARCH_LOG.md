@@ -156,3 +156,58 @@ No MPFM experiment was run as part of this documentation update.
 3. Use exchange-agnostic internal schemas and capability-aware broker adapters; verify segment, depth, rate-limit, account and data rights per provider.
 4. Separate forecast quality, strategy decision quality, execution quality, net economic performance and operational reliability.
 5. Retain the existing repository's implemented status as documented; this new design does not turn the research-only FastAPI MVP into a live trading system.
+
+
+## 2026-11-21 — HFT systems, market microstructure and open-source ecosystem research
+
+### Scope reviewed
+
+- Reviewed the complete recursive Finance-Ai main tree at SHA 88d56d6ef5f7b12c2bdaffe38618ca74cb01585 (332 entries, 280 files, no truncation).
+- Inspected selected source and design areas covering historical ingestion, instrument registry, feature registry, point-in-time multimodal joins, backtest execution, walk-forward validation, API decision/orchestration, model registry, retraining, risk and current-state documentation.
+- Reviewed public technology/market-making disclosures from Optiver, HRT, Jane Street, IMC, Jump Trading and Virtu.
+- Inspected core README/tree/source/docs paths in NautilusTrader, HftBacktest, ABIDES, LEAN, Hummingbot and FinRL-X; reviewed Qlib and QuestDB project material.
+
+### Repository findings preserved
+
+- The existing repository is a Python research backend with React/Vite dashboard, not a complete low-latency trading platform.
+- The MVP source path is historical Yahoo-style daily/weekly/monthly data; live Indian depth/tick feeds are not established.
+- Current backtest execution is long-only, fixed one-unit, close-to-close and cost-simplified. It is not an order-book/queue/latency-aware HFT simulator.
+- The current prediction API is 1d-only and refuses live mode; no broker order execution gateway is present in the inspected MVP.
+- The existing point-in-time data layer, feature/dataset versioning, leakage controls, registry, drift and controlled retraining should be preserved.
+- PostgreSQL is still a deferred target per the existing ADR; no database rewrite is implied.
+- Public OSS and company material has been separated from proprietary firm internals and from claims about our own implementation.
+
+### Open-source shortlist
+
+- NautilusTrader: event-driven trading engine, risk/portfolio/execution lifecycle and backtest/live architecture reference; LGPL-3.0 needs review.
+- HftBacktest: specialist market replay, L2/L3, queue, latency and fee model reference; MIT; explicitly no market impact in its replay model.
+- ABIDES: agent-based, discrete-event market simulation; BSD 3-Clause; synthetic assumptions need calibration.
+- LEAN: event-driven backtesting, execution and risk interfaces; Apache-2.0.
+- Hummingbot: exchange connector/order executor and recovery-test patterns; Apache-2.0, primarily digital-asset venues.
+- FinRL-X: modular portfolio/strategy-weight research; Apache-2.0.
+- Qlib: quant research and factor/workflow reference; MIT.
+- QuestDB, DuckDB/Polars/Arrow/Parquet and Kafka/NATS/Aeron are optional infrastructure candidates, not simultaneous mandatory dependencies.
+
+### HFT firm engineering patterns inferred from public material
+
+- Data, pricing/alpha, risk and execution are interdependent platform capabilities.
+- Research infrastructure, reproducibility, model robustness and production feedback loops matter as much as model architecture.
+- Low-latency networking, C++/Rust/OCaml, FPGA/ASIC and co-location are specialist choices that require a proven strategy and measured bottleneck.
+- Market making is not the same as directional price prediction: pricing, spread, inventory, adverse selection and quote/execution control need distinct treatment.
+
+### Indian market-data and compliance boundary
+
+- NSE publicly offers L1/L2/L3/tick-by-tick products with distinct market-depth semantics and multicast/leased-line delivery.
+- NSE market-data usage and redistribution are controlled by policy/subscription agreements; broker API access is not an automatic non-display or redistribution licence.
+- SEBI retail algo framework and exchange/broker implementation processes must be verified before any automated order path.
+- These are data-rights and operational gates, not software integration details.
+
+### Decisions and next actions
+
+1. Keep D0 → D1 → D2 → D3 → D4 unchanged.
+2. Keep Finance AI prediction-first; do not claim HFT capability or profitability.
+3. Maintain HFT as a separate research/feasibility lane.
+4. Prepare a source entitlement register, canonical event schema and OSS licence/version scorecard.
+5. Only after licensed depth/tick data arrives, create a bounded microstructure POC with simple baselines and explicit queue/latency/market-impact assumptions.
+6. Later evaluate HftBacktest/ABIDES for research and NautilusTrader for an isolated paper execution-engine integration.
+7. Preserve the distinction between source-level code review, public-firm evidence, proposed design and implemented functionality.
