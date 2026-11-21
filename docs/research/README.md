@@ -13,6 +13,7 @@ This folder is the living research layer for the Finance AI project. It records 
 | [MPFM Research Master](MPFM_RESEARCH_MASTER.md) | Product objective, MPFM thesis, architecture, known research gaps and evidence rules |
 | [Prediction Model Research](PREDICTION_MODEL_RESEARCH.md) | Existing model results, target design, model comparisons and proposed experiments |
 | [Market Data & Broker Integration](MARKET_DATA_AND_BROKER_INTEGRATION.md) | Historical/live data sources, six broker APIs, source rights and integration boundaries |
+| [NautilusTrader Compatibility & HftBacktest POC](NAUTILUS_COMPATIBILITY_AND_HFTBACKTEST_POC.md) | Exact Finance AI interface mapping, custom adapter feasibility, event schema and HFT data requirements, POC experiments and go/no-go gates |
 | [HFT Systems and Open-Source Ecosystem Research](HFT_SYSTEMS_AND_OPEN_SOURCE_ECOSYSTEM_RESEARCH.md) | Public HFT firm operating models, source-level open-source reviews, event-driven architecture, market-microstructure data requirements, tool strategy and staged integration recommendations |
 | [Personal Multi-Market Trading System Design](FINANCE_AI_TRADING_SYSTEM_DESIGN.md) | Clarified personal trading-intelligence vision, HFT-vs-retail-algo boundary, multi-model signal engine, risk/execution, adapters and roadmap |
 | [Development Backlog](DEVELOPMENT_BACKLOG.md) | D0 → D1 → D2 → D3 → D4 order, workstreams and dependencies |
