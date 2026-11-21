@@ -1,6 +1,6 @@
 # MPFM Research Master
 
-**Last research consolidation:** 2026-11-17  
+**Last research consolidation:** 2026-11-21  
 **Research priority:** market prediction first  
 **Parent product:** Finance AI  
 **Research/model architecture:** Multi-Philosophy Financial Model (MPFM)
@@ -207,3 +207,26 @@ The key decisions are:
 - Do not map the current daily OHLCV data source or BUY/SELL output directly to a live execution command.
 - Preserve the current close-to-close research backtest as a separately versioned baseline.
 - Keep D0 → D1 → D2 → D3 → D4 unchanged.
+
+
+## 12. Backend model research and benchmark programme — 2026-11-21
+
+The user's clarified technical priority is backend-first model and algorithm development: read current research papers, reproduce strong baselines, design candidate algorithms, and assess them across accuracy, precision, recall, F1, calibration, statistical significance, economic performance and runtime.
+
+The new [MPFM Model Research & Benchmark Roadmap](MPFM_MODEL_RESEARCH_AND_BENCHMARK_ROADMAP.md) records:
+- A current evidence-based review of FinVerse (2026), pretrained TSFMs for financial returns (2026), TFWM/Market-1T (2026), TensorLOB (2026), TailDART (2026), LiT (2025), financial ML evaluation integrity (2026 working paper) and FinCast (2025).
+- A multi-view benchmark contract covering classification, regression, probabilistic forecasts, volatility, cross-sectional ranking, portfolio outcomes, statistical evidence and inference latency.
+- Candidate algorithms RC-MTFSM, SPT-LOB, RGEE, CSFA, DHT-FH and DSA. These are proposed hypotheses only; no novelty or performance claim is made.
+- A model-research agent organisation and the MBR-00 to MBR-09 experiment sequence.
+
+### New research conclusions
+
+1. A single Accuracy/F1 leaderboard is insufficient. Financial model selection needs point-wise, ranking and realised portfolio views.
+2. Pretrained time-series foundation models can be useful priors, but recent return-forecasting evidence shows that statistically reliable gains over random-walk baselines are sparse and asset-dependent.
+3. Shared representations may help return and volatility tasks, while spread/liquidity can need specialist capacity.
+4. Structure-preserving tensor architectures are a promising LOB research direction, but FI-2010 and crypto/US datasets do not prove Indian-market transfer.
+5. Compact inference and low latency should be measured after predictive quality and calibration; model-only sub-millisecond results do not represent feed-to-decision latency.
+6. The previous LR/RF ensemble regression means that simple averaging or majority voting must not be assumed to improve performance.
+7. First execution should re-establish current baselines, add naive/random-walk comparisons, complete classification/calibration metrics and expand out-of-sample evaluation before attempting the new MPFM candidates.
+
+The existing D0 → D1 → D2 → D3 → D4 sequence remains unchanged. The model research programme supports that sequence and does not bypass the point-in-time financial foundation or data-rights dependencies.
