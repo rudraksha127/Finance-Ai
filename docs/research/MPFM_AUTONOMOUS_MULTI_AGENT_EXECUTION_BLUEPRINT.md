@@ -1010,3 +1010,91 @@ A future financial execution subsystem, if ever authorised, must have independen
 - Research Log: https://github.com/rudraksha127/Finance-Ai/blob/main/docs/research/RESEARCH_LOG.md
 - HFT/Open-source ecosystem: https://github.com/rudraksha127/Finance-Ai/blob/main/docs/research/HFT_SYSTEMS_AND_OPEN_SOURCE_ECOSYSTEM_RESEARCH.md
 - Personal trading system design: https://github.com/rudraksha127/Finance-Ai/blob/main/docs/research/FINANCE_AI_TRADING_SYSTEM_DESIGN.md
+
+
+---
+
+## 18. User-priority clarification: backend model research is the primary mission
+
+The user's primary focus is the backend: models, algorithms, accuracy/precision/recall/F1 and the complete quantitative benchmark suite. The autonomous organisation must therefore be model-research-led. General documentation, UI work and agent conversation volume are secondary.
+
+The detailed programme is maintained in [MPFM_MODEL_RESEARCH_AND_BENCHMARK_ROADMAP.md](MPFM_MODEL_RESEARCH_AND_BENCHMARK_ROADMAP.md). It includes a paper review through 2026-11-21, model hypotheses, benchmark metrics, baseline families and experiment IDs MBR-00 to MBR-09.
+
+### 18.1 Dedicated model-research workstream
+
+The Research Director should prioritise these specialist roles:
+
+1. **Latest Paper Scout:** discover recent primary papers, conference/journal publications, preprints, code and benchmark releases; record publication date, status and exact sources.
+2. **Paper Methodology Extractor:** extract dataset, universe, label/target, horizon, split, architecture, compute, metrics, result tables, limitations and code availability.
+3. **Benchmark/Data Auditor:** verify point-in-time correctness, data rights, instrument universe, leakage, class distribution and split validity.
+4. **Baseline Reproduction Engineer:** reproduce naive, classical ML, tree, deep temporal and foundation-model baselines under one frozen contract.
+5. **Algorithm Researcher:** formulate new falsifiable hypotheses from observed limitations and prior art.
+6. **Model Implementation Engineer:** implement candidate models in scoped branches; add unit, numerical parity and inference tests.
+7. **Experiment Scheduler:** run bounded training/sweeps under queue, hardware, token and wall-clock budgets.
+8. **Metric/Statistical Evaluator:** independently recompute metrics from prediction artifacts and run statistical/uncertainty checks.
+9. **Robustness/Adversarial Reviewer:** test regime shifts, unseen instruments, missing data, class imbalance and threshold sensitivity.
+10. **Performance Engineer:** profile feature computation, model inference, serialization, queueing and end-to-end latency.
+11. **Model Promotion Reviewer:** decide candidate status using the predefined data, leakage, forecast, calibration, robustness, economic and runtime gates.
+
+These are role contracts, not a requirement to host eleven separate large models. Worker replicas may implement roles while maintaining isolated permissions and outputs.
+
+### 18.2 Required benchmark outputs
+
+Every model experiment must report the relevant metrics, not only the metrics that make it look good:
+
+- Classification: accuracy, balanced accuracy, per-class precision/recall/F1, macro-F1, weighted-F1, MCC, confusion matrix, ROC-AUC and PR-AUC where applicable.
+- Regression/direction: MAE, RMSE, MASE, relative MAE, directional hit ratio and Rank IC/ICIR.
+- Probabilistic: log loss/NLL, Brier, ECE, reliability curves, pinball loss, CRPS and interval coverage.
+- Volatility/risk: QLIKE, realised-volatility error and tail-risk coverage.
+- Portfolio: net return, Sharpe, Sortino, Calmar, drawdown, turnover, costs, slippage, capacity and fill metrics.
+- Statistical evidence: Diebold–Mariano where appropriate, block bootstrap, multiple-testing correction, Deflated Sharpe and PBO/CPCV when applicable.
+- Runtime: P50/P95/P99/P99.9, throughput, cold start, peak memory and separate model-only versus full event-to-decision latency.
+
+The evaluator must include majority-class and zero-return/random-walk baselines. Accuracy and weighted-F1 alone are not sufficient for class-imbalanced market labels.
+
+### 18.3 Agent-to-experiment execution contract
+
+The agent workflow for a new model should be:
+
+```text
+Latest paper / observed weakness
+             |
+             v
+Methodology and prior-art extraction
+             |
+             v
+Data / target / benchmark contract audit
+             |
+             v
+Baseline reproduction
+             |
+             v
+Falsifiable algorithm hypothesis
+             |
+             v
+Implementation on isolated branch
+             |
+             v
+Frozen experiment / bounded sweep
+             |
+             v
+Independent metric recomputation
+             |
+             v
+Statistical + robustness + latency review
+             |
+             v
+Candidate / Reject / Revise / More data
+```
+
+No agent may declare an algorithm better because one score increased. It must show the baseline, per-class impact, calibration, statistical uncertainty, regime coverage and economic/runtime implications relevant to the claim.
+
+### 18.4 Immediate priority
+
+The first model tasks are MBR-00 and MBR-01 from the model roadmap:
+- Re-establish the existing Finance AI baseline from a new immutable run manifest.
+- Add zero-return/random-walk and strong classical comparators.
+- Produce the full classification/calibration report.
+- Define a new untouched evaluation period and expand to additional instruments where licensed data permits.
+
+Only after these tasks should the system move to advanced MPFM model hypotheses. The agreed D0 → D1 → D2 → D3 → D4 sequence and point-in-time/data-rights gates remain authoritative.
