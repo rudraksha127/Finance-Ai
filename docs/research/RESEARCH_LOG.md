@@ -257,3 +257,74 @@ No MPFM experiment was run as part of this documentation update.
 4. Keep HftBacktest blocked on lawful depth/tick data and timestamp/event semantics.
 5. Preserve D0 → D1 → D2 → D3 → D4 sequence.
 6. No new dependency, broker integration, live order capability or HFT capability is marked implemented.
+
+
+## 2026-11-21 — Autonomous multi-agent orchestration deep research and execution plan
+
+### User objective clarified
+
+- Build an autonomous multi-agent system for Finance AI / MPFM that can research, analyse, run approved experiments, monitor work, and contribute to engineering continuously (24/7).
+- Agents should have specialist expertise and bounded independent execution; they should not depend on a human to assign every small subtask.
+- The system must preserve existing MPFM research integrity, D0 → D1 → D2 → D3 → D4 order, source licensing, model-promotion gates and separation of prediction from execution.
+
+### Existing implementation boundary rechecked
+
+- The current repository has an operations/health subsystem, autonomous data-pipeline and retraining workflows, drift detection, model registry and research pipeline.
+- These are useful deterministic foundations but are not a general LLM multi-agent runtime.
+- No multi-agent registry, durable LLM task orchestration, agent identity/permission service, sandboxed autonomous code worker or 24/7 agent control plane was evidenced in the inspected repository snapshot.
+- This is proposed architecture only; no agent runtime or worker was implemented in this research update.
+
+### Current framework research
+
+- Temporal Python SDK: selected as the recommended durable workflow backbone because workflow event history supports replay/recovery; external side effects and nondeterministic work such as LLM calls, API calls, database queries and file I/O belong in Activities. Activities should be idempotent under retries. Local CLI development server is suitable for the first prototype; production requires Temporal Cloud or a properly operated self-hosted service.
+- Microsoft Agent Framework: selected as the initial specialist-agent framework candidate. Its Python orchestration package reached 1.0 on 2026-07-08, with sequential, concurrent, group-chat, handoff and Magentic patterns documented as stable. Provider support includes multiple hosted and local model ecosystems, but tool/structured-output capabilities differ by provider.
+- Magentic should be used only for bounded open-ended research with explicit max rounds, fan-out, budgets and stop conditions; Microsoft documentation cautions that behaviour outside the original Magentic-One design has not been fully tested.
+- OpenAI Agents SDK: retained as an alternative for agents requiring its own tools, handoffs, sessions, guardrails, HITL approvals, tracing and testing; it is not selected as a second default orchestration framework.
+- LiteLLM: optional future provider gateway for shared routing, budgets, rate limits and fallbacks. First create an internal ModelGateway interface; avoid nested retry loops.
+- Ray, Kafka, NATS, Aeron, Kubernetes, multiple databases and vector stores are not first-phase dependencies. Add only when a measured workload needs them.
+
+### Recommended architecture
+
+1. Temporal owns durable workflows, timers/schedules, retry/cancellation, task queues, parent-child workflow lineage and recovery.
+2. Microsoft Agent Framework supplies specialist reasoning/collaboration inside bounded activities/workflow steps.
+3. Finance AI owns canonical task contracts, agent registry, tool permissions, model budgets, evidence quality, D0–D4 linkage and project truth.
+4. Separate worker queues isolate research, review, data checks, experiment compute, model training, code sandbox and read-only monitoring workloads.
+5. Existing MPFM pipeline, model registry, backtester, feature store/contracts and dashboard remain authoritative.
+6. Workflow state, task working context, curated knowledge and experiment evidence are four distinct memory categories; agent conversation history is not the system of record.
+7. Start with eight agent roles: Director, Literature/OSS Scout, Data/Point-in-Time Auditor, Quant/Algorithm Researcher, Experiment Operator, Engineering Agent, Independent Critic/Evaluator and Security/Risk Guardian.
+8. Start with deterministic task graphs. Permit dynamic delegation only under maximum depth, fan-out, budget, deadline and approved-agent constraints.
+
+### Security research
+
+- Reviewed CERT-In AI Security Auditing Guidelines v1.0 dated 2026-11-04, especially Sections 9.7 and 9.9.
+- Controls include unique identities, authorised objectives, approved tools, least privilege, action limits, human approvals for consequential actions, protected execution logs, emergency interruption, credential revocation, authenticated agent-to-agent communication, bounded delegation, memory/context isolation, recursive delegation and cascading-failure controls.
+- External web pages, repository content, news and tool output are untrusted evidence, never higher-priority instructions.
+- Initial autonomy is A0–A3: read-only observation/research, approved experiments and sandboxed branch/PR changes. Merge, deployment, secrets/entitlement changes, model promotion and financial actions remain protected/human-controlled.
+- Research agents must have no broker credentials and no ability to place, cancel or modify live orders.
+- OWASP Agentic Applications 2026 and OWASP GenAI LLM Top 10 2026 are added as ongoing security references.
+
+### Execution programme proposed
+
+- A0: architecture, role charters, task/result schemas, permission matrix, budgets and threat model.
+- A1: one durable read-only research workflow with two or three specialist agents and an independent critic; test restart/resume, evidence and cancellation.
+- A2: concurrent/sequential task graphs, provenance, duplicate-work detection and bounded dynamic delegation.
+- A3: scheduled/event-triggered 24/7 workers, queue isolation, observability, budgets and kill switches.
+- A4: sandboxed engineering agent with isolated branch, tests, independent review and PR-only output.
+- A5: integration with existing MPFM D0–D4, dataset, backtest, model registry and research-log APIs.
+- A6: production resilience, redundant workers on separate failure domains, backups, security and recovery drills, load tests and runbooks.
+
+### Initial proof-of-concept workflows
+
+1. Open-source compatibility/licence assessment with exact repository commit and evidence.
+2. Reproducible approved quant experiment using a frozen dataset/configuration and independent metric verification.
+3. Safe engineering contribution on an isolated branch, with sandbox tests and a human-controlled PR merge.
+
+### New research artifact
+
+- Added [MPFM_AUTONOMOUS_MULTI_AGENT_EXECUTION_BLUEPRINT.md](MPFM_AUTONOMOUS_MULTI_AGENT_EXECUTION_BLUEPRINT.md).
+- Added the document to the research index.
+- The blueprint contains framework comparisons, recommended three-plane architecture, eight initial agent roles, typed task lifecycle, 24/7 activation design, memory/evidence model, model routing/budgeting, CERT-In/OWASP security boundaries, failure-injection tests, proposed repository structure and A0–A6 implementation stages.
+
+### Current decision
+
+Build one durable, observable, restartable, budgeted and secure research workflow before creating a large agent swarm. The initial goal is proven task completion and evidence traceability, not maximum agent count or nonstop LLM activity. No agent runtime, new dependency, live feed, live execution path or production deployment is marked implemented.
