@@ -211,3 +211,49 @@ No MPFM experiment was run as part of this documentation update.
 5. Only after licensed depth/tick data arrives, create a bounded microstructure POC with simple baselines and explicit queue/latency/market-impact assumptions.
 6. Later evaluate HftBacktest/ABIDES for research and NautilusTrader for an isolated paper execution-engine integration.
 7. Preserve the distinction between source-level code review, public-firm evidence, proposed design and implemented functionality.
+
+
+## 2026-11-21 — NautilusTrader compatibility and HftBacktest POC design
+
+### Exact Finance AI interface files reopened
+
+- \`src/data/sources/base.py\` and \`src/data/sources/yahoo.py\`: historical-only provider contract; intervals documented as 1d/1wk/1mo and records are OHLCV-style.
+- \`src/data/instruments.py\`: current ticker identity record is minimal (ticker, active flag, optional exchange and first_seen).
+- \`src/backtest/signals.py\`: deterministic BUY / SELL / NO_TRADE from UP/DOWN probabilities.
+- \`src/api/schemas.py\` and \`src/api/orchestrator.py\`: inference API interval is 1d only; current API mode live is refused.
+- \`src/api/decision.py\`: one-unit placeholder position size for a non-NO_TRADE signal.
+- \`src/backtest/execution.py\`: long-only fixed quantity, close-to-close, single position and fixed bps costs.
+- \`docs/DECISIONS.md\`, \`docs/ENGINEERING_CONSTITUTION.md\`, \`docs/CURRENT_STATE.md\`: Python-first MVP, file-backed storage, dependency constraints, prediction/decision/execution separation and current research-only state.
+
+### NautilusTrader compatibility finding
+
+- Current docs describe a Rust core with Python/PyO3 control and custom Python DataClient/ExecutionClient adapters.
+- The custom adapter contract includes typed event publication, instrument provider/factory registration, order command outcomes, venue/client order ID correlation, order/fill/position reports and reconciliation.
+- The current official adapter list reviewed has no NSE/BSE/MCX or Indian retail broker adapters.
+- A custom India adapter is possible in principle but Finance AI would own data semantics, broker-specific order handling, reconciliation, tests and maintenance.
+- No direct BUY → submit_order mapping is acceptable. A versioned forecast/strategy-intent contract and independent risk policy must sit between them.
+- Proposed an isolated no-credentials runtime spike, canonical instrument mapping, ForecastEvent custom-data mapping and deterministic mock lifecycle tests.
+
+### HftBacktest compatibility finding
+
+- Current HftBacktest documentation describes an 8-field NumPy event schema with event flags, exchange timestamp, local receive timestamp, price, quantity and optional L3 order ID.
+- The current Finance AI daily OHLCV contract lacks the order-book updates, event timestamps, local receive time, sequence semantics and order identifiers needed for queue/latency replay.
+- HftBacktest documents risk-averse and probability-based queue progression.
+- Its replay assumes the recorded market is immutable and does not simulate market impact.
+- Proposed a staged HFT-POC-00 to HFT-POC-04 program: source admissibility, microstructure baselines, model comparisons, latency/queue sensitivity and strategy micro-simulation.
+
+### Indian feed capability clarification
+
+- NSE's public feed page describes L1 best bid/ask, L2 up to five levels, L3 up to twenty levels and tick-by-tick full-order-book data; feed delivery is multicast over dedicated leased-line connectivity.
+- MCX's public feed material describes real-time L1 touchline and L2 up to five best bid/ask levels.
+- Do not equate 20-level market-by-price data with order-by-order L3 IDs. Obtain the exact feed data dictionary before claiming HftBacktest L3 compatibility.
+- Exchange feed permissions, non-display use and storage/training rights are separate from broker API access.
+
+### Decision and next actions
+
+1. Keep Finance AI research and instrument identity authoritative.
+2. Do not replace the current backtest engine; keep any event-driven simulator as a separately versioned comparison.
+3. Run only a no-broker-credential Nautilus compatibility spike until a separate integration decision is approved.
+4. Keep HftBacktest blocked on lawful depth/tick data and timestamp/event semantics.
+5. Preserve D0 → D1 → D2 → D3 → D4 sequence.
+6. No new dependency, broker integration, live order capability or HFT capability is marked implemented.
