@@ -230,3 +230,27 @@ The new [MPFM Model Research & Benchmark Roadmap](MPFM_MODEL_RESEARCH_AND_BENCHM
 7. First execution should re-establish current baselines, add naive/random-walk comparisons, complete classification/calibration metrics and expand out-of-sample evaluation before attempting the new MPFM candidates.
 
 The existing D0 → D1 → D2 → D3 → D4 sequence remains unchanged. The model research programme supports that sequence and does not bypass the point-in-time financial foundation or data-rights dependencies.
+
+
+## 13. Modular system architecture and engineering disciplines — 2026-11-21
+
+The user clarified that MPFM research, open-source reviews and model benchmarks must directly inform the actual system design. The system must be modular and use computer-science/software-engineering fundamentals to remain correct, performant, maintainable and reliable in real-world operation.
+
+Added [MPFM Modular System Architecture & Engineering Blueprint](MPFM_MODULAR_SYSTEM_ARCHITECTURE_AND_ENGINEERING_BLUEPRINT.md).
+
+### Architecture decisions proposed
+
+1. Use a modular monolith with DDD bounded contexts and ports/adapters as the initial code architecture; extract independently deployable services only when performance, isolation, scaling or operational requirements justify them.
+2. Separate product/control, real-time market-data/decision, research/model, autonomous-agent and platform-engineering planes.
+3. Preserve Python-first MVP and existing accepted ADRs. Any Rust/C++ hot path, new database, cloud service or external broker/market-data integration needs measured evidence and an explicit new/superseding ADR.
+4. Define independent module ownership for source entitlements, reference/security master, market data, market state, corporate actions, point-in-time data, features, datasets, model research/registry, inference, decision/risk, backtesting, future execution, agent orchestration and application API.
+5. Apply DSA structures from actual event workloads (bounded ring buffers, hash maps, monotonic deques, heaps, ordered price-level structures and bounded queues); benchmark and property-test before optimisation.
+6. Apply OOP/OOPM/OOAD with domain entities/value objects, immutable events, application services, ports/adapters, explicit state machines, SOLID and C4/UML artefacts; avoid unnecessary class and service proliferation.
+7. Apply CN/OS/DBMS/distributed-systems principles: timestamp/sequence correctness, reconnect and gap recovery, async I/O vs CPU-bound workers, process/resource isolation, bounded queues/backpressure, idempotency, transactional outbox where needed, replay, transactions and recovery.
+8. Keep training, inference, decision/risk and any future execution separate. LLM agents do not sit on the per-tick market hot path.
+9. Add SLOs, fault-injection, contract/property/soak/performance/security tests, telemetry, backups and incident/recovery procedures before claiming production readiness.
+10. Preserve the D0 → D1 → D2 → D3 → D4 priority sequence.
+
+### Evidence boundary
+
+The existing SYSTEM_ARCHITECTURE.md describes the MVP; ARCHITECTURE_PRINCIPLES.md and accepted ADRs record existing layer and dependency decisions. The new modular blueprint is a proposed target state. It does not claim a new architecture, database, broker adapter, hot path or production infrastructure has been implemented.
