@@ -88,3 +88,24 @@ No item is complete solely because its interface or UI exists.
 3. Close the data-rights dependency before real-market experiments that require those sources.
 4. Do not move to multimodal model training until the point-in-time financial foundation passes acceptance.
 5. At D4, run integrated MPFM experiments under the controlled protocol in [MPFM Research Master](MPFM_RESEARCH_MASTER.md) and [Prediction Model Research](PREDICTION_MODEL_RESEARCH.md).
+
+
+## 8. Modular architecture and engineering quality gates
+
+The modular system architecture is a cross-cutting design constraint for every D0–D4 workstream. It does not change the confirmed dependency order or infer a missing task-to-D-code mapping.
+
+Before a D0–D4 module is considered accepted, it must have:
+
+- A bounded-context owner, responsibility and non-goals.
+- Versioned input/output contracts and dependency/import boundaries.
+- Data ownership, timestamp/availability semantics and lineage.
+- Explicit algorithms/data structures and a complexity/performance rationale where workload-sensitive.
+- Failure, timeout, retry, idempotency and recovery behaviour.
+- Security, permissions and data-rights classification.
+- Unit, property, contract, integration and relevant fault/performance tests.
+- Observability, audit trail and measurable acceptance criteria.
+- ADR for material architecture or dependency changes.
+
+Reference blueprint: [MPFM Modular System Architecture & Engineering Blueprint](MPFM_MODULAR_SYSTEM_ARCHITECTURE_AND_ENGINEERING_BLUEPRINT.md).
+
+Keep the initial architecture modular and independently testable; do not split modules into microservices or introduce databases, brokers, compiled hot paths or cloud services without a specific workload, measured need, migration plan and ADR. Existing MVP decisions remain in force until explicitly superseded.
